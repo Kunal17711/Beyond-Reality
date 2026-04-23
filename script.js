@@ -151,3 +151,63 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.head.appendChild(style);
 });
+
+// ============================================================
+// MOBILE PANEL TOGGLE — Shows/Hides data cards on simulators
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const uiOverlay = document.getElementById('ui-overlay');
+    
+    if (uiOverlay && window.innerWidth <= 768) {
+        // Create the floating toggle button
+        const toggleBtn = document.createElement('button');
+        toggleBtn.id = 'panel-toggle-btn';
+        toggleBtn.innerHTML = '📊';
+        toggleBtn.title = 'Toggle Info Panel';
+        
+        // Add styles dynamically
+        const btnStyle = document.createElement('style');
+        btnStyle.textContent = `
+            #panel-toggle-btn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 9999;
+                width: 55px;
+                height: 55px;
+                border-radius: 50%;
+                background: rgba(0,0,0,0.8);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.2);
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+                transition: all 0.3s ease;
+            }
+            #panel-toggle-btn.active {
+                background: rgba(94, 92, 230, 0.9);
+                transform: scale(1.1);
+            }
+            #ui-overlay {
+                transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+            }
+            #ui-overlay.hidden {
+                transform: translateX(-120%);
+                opacity: 0;
+                pointer-events: none;
+            }
+        `;
+        document.head.appendChild(btnStyle);
+        document.body.appendChild(toggleBtn);
+
+        toggleBtn.addEventListener('click', () => {
+            uiOverlay.classList.toggle('hidden');
+            toggleBtn.classList.toggle('active');
+            toggleBtn.innerHTML = uiOverlay.classList.contains('hidden') ? '🔭' : '📊';
+        });
+    }
+});
