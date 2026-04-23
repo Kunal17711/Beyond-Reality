@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Hole Simulation | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #ffaa00;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px;}
+        .data-value { color: #fff; font-weight: 600;}
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+        .control-group label {
+            display: block;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ffaa00;
+        }
+
+        #controls-info { 
+            position: absolute; 
+            bottom: 40px; 
+            right: 40px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="multiverse.html">Multiverse</a>
+                        <a href="observations.html">Observations</a>
+                        <a href="lightspeed.html">Light Speed</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: #ffaa00; color: #000; border: none; font-weight: 600;">Event Horizon Physics</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Gargantua Sim</h1>
+        
+        <div class="data-panel">
+            <h2>Supermassive Class</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">Hyper-realistic gravitational lensing and Doppler beaming active.</p>
+            
+            <div class="physics-data">
+                <div><span class="data-label">MASS (M☉)</span><span id="bh-mass" class="data-value">100 × 10^6</span></div>
+                <div><span class="data-label">RADIUS (R_s)</span><span id="bh-rad" class="data-value">2.95 × 10^11 m</span></div>
+                <div><span class="data-label">SPIN (a*)</span><span id="bh-spin" class="data-value">0.998</span></div>
+                <div><span class="data-label">TIME DILATION</span><span id="bh-temp" class="data-value">Extreme</span></div>
+            </div>
+
+            <div class="control-group">
+                <label>ACCRETION DISK INTENSITY</label>
+                <input type="range" id="disk-density" min="1" max="100" value="80">
+            </div>
+            <div class="control-group">
+                <label>SPIN RATE (FRAME DRAGGING)</label>
+                <input type="range" id="spin-rate" min="0" max="100" value="50">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>ds² = -(1 - R_s/r)c²dt² + (1 - R_s/r)⁻¹dr²</div>
+        <div>GRAVITATIONAL LENSING: ACTIVE</div>
+        <div style="margin-top: 10px; color: #ffaa00;">RELATIVISTIC DOPPLER BEAMING</div>
+    </div>
+
+    <div id="controls-info">
+        DRAG TO ORBIT OBSERVATION VECTOR<br>
+        SCROLL TO ZOOM (WARNING: TIDAL FORCES)
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x010103);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 15, 60);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxDistance = 200;
+        controls.minDistance = 25; 
+
+        // Starfield Background
+        const starGeo = new THREE.BufferGeometry();
+        const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.6 });
+        const starPos = [];
+        for (let i = 0; i < 8000; i++) {
+            const r = 400 + Math.random() * 200;
+            const theta = 2 * Math.PI * Math.random();
+            const phi = Math.acos(2 * Math.random() - 1);
+            starPos.push(r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi));
+        }
+        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+        scene.add(new THREE.Points(starGeo, starMat));
+
+        // --- BLACK HOLE LOGIC ---
+        const R_S = 10; // Schwarzschild Radius
+
+        // 1. Event Horizon (Pure Black Sphere)
+        const ehGeo = new THREE.SphereGeometry(R_S, 64, 64);
+        const ehMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        const eventHorizon = new THREE.Mesh(ehGeo, ehMat);
+        scene.add(eventHorizon);
+
+        // GLSL Shader for the Accretion Disk (Fiery, Doppler Beamed)
+        const diskVertexShader = `
+            varying vec2 vUv;
+            varying vec3 vPos;
+            void main() {
+                vUv = uv;
+                vPos = position;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const diskFragmentShader = `
+            uniform float time;
+            uniform float intensity;
+            uniform int isLensed;
+            
+            varying vec2 vUv;
+            varying vec3 vPos;
+
+            // Simplex noise function
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1;
+                i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m;
+                m = m*m;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                // vUv.y is distance from inner edge (0) to outer edge (1)
+                // vUv.x is angle around the ring
+                float dist = vUv.y;
+                float angle = vUv.x * 6.28318; // 2 * PI
+
+                // Base Color Gradient (Hot White/Blue inner -> Orange -> Deep Red outer)
+                vec3 coreColor = vec3(1.0, 0.9, 0.6);
+                vec3 midColor = vec3(1.0, 0.3, 0.0);
+                vec3 edgeColor = vec3(0.3, 0.0, 0.0);
+
+                vec3 color = mix(coreColor, midColor, smoothstep(0.0, 0.4, dist));
+                color = mix(color, edgeColor, smoothstep(0.4, 1.0, dist));
+
+                // Add Noise/Turbulence
+                float n1 = snoise(vec2(angle * 5.0 - time * 3.0, dist * 8.0));
+                float n2 = snoise(vec2(angle * 20.0 + time * 1.5, dist * 20.0));
+                float turbulence = (n1 * 0.5 + 0.5) * (n2 * 0.5 + 0.5);
+                
+                color *= 0.6 + 0.6 * turbulence;
+
+                // Relativistic Doppler Beaming
+                // One side of the disk is moving towards camera (brighter/bluer), other is moving away (dimmer/redder)
+                float doppler = sin(angle); 
+                
+                if (isLensed == 1) {
+                    // Lensed disk Doppler mapping needs to align with the main disk visually
+                    // It's a complex topological mapping, but we approximate by making the top/bottom edges fade correctly
+                    doppler = cos(angle);
+                }
+                
+                float beamFactor = smoothstep(-1.0, 1.0, doppler);
+                color *= mix(0.3, 1.8, beamFactor); // Boost brightness on approaching side
+
+                // Alpha fade out at edges
+                float alpha = smoothstep(0.0, 0.1, dist) * smoothstep(1.0, 0.8, dist);
+
+                gl_FragColor = vec4(color * intensity, alpha * intensity);
+            }
+        `;
+
+        const diskUniforms = {
+            time: { value: 0.0 },
+            intensity: { value: 1.0 },
+            isLensed: { value: 0 }
+        };
+
+        const diskMaterial = new THREE.ShaderMaterial({
+            vertexShader: diskVertexShader,
+            fragmentShader: diskFragmentShader,
+            uniforms: diskUniforms,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+
+        const lensedUniforms = {
+            time: { value: 0.0 },
+            intensity: { value: 1.0 },
+            isLensed: { value: 1 } // Tell shader to tweak Doppler mapping
+        };
+
+        const lensedMaterial = new THREE.ShaderMaterial({
+            vertexShader: diskVertexShader,
+            fragmentShader: diskFragmentShader,
+            uniforms: lensedUniforms,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+
+        // 2. Main Accretion Disk (Horizontal)
+        // High segment count for smooth UV mapping
+        const mainDiskGeo = new THREE.RingGeometry(R_S + 1.5, R_S + 18, 128, 32); 
+        const mainDisk = new THREE.Mesh(mainDiskGeo, diskMaterial);
+        mainDisk.rotation.x = Math.PI / 2;
+        scene.add(mainDisk);
+
+        // 3. The "Lensed" Disk (Vertical, Behind Black Hole)
+        // This creates the iconic Interstellar Gargantua look!
+        const lensedDiskGeo = new THREE.RingGeometry(R_S + 0.5, R_S + 19, 128, 32);
+        const lensedDisk = new THREE.Mesh(lensedDiskGeo, lensedMaterial);
+        // Position it slightly behind the black hole so the Event Horizon occludes the center
+        lensedDisk.position.z = -1; 
+        scene.add(lensedDisk);
+
+        // UI Controls
+        const densitySlider = document.getElementById('disk-density');
+        const spinSlider = document.getElementById('spin-rate');
+
+        densitySlider.addEventListener('input', (e) => {
+            diskUniforms.intensity.value = e.target.value / 80;
+            lensedUniforms.intensity.value = e.target.value / 80;
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+            
+            controls.update();
+
+            const spinMultiplier = spinSlider.value / 50;
+
+            // Update Shader Time
+            diskUniforms.time.value += delta * spinMultiplier;
+            lensedUniforms.time.value += delta * spinMultiplier;
+
+            // Interstellar Lensing Trick:
+            // The lensed disk must always face the camera perfectly to simulate the light bending around the sphere.
+            lensedDisk.lookAt(camera.position);
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

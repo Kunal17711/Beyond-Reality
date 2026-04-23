@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature of Time | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #00ffcc;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); }
+        .data-value { color: #fff; font-weight: 600; font-size: 1rem;}
+        .data-value.highlight { color: #00ffcc; font-size: 1.2rem; }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+        .control-group label {
+            display: block;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00ffcc;
+        }
+
+        #controls-info { 
+            position: absolute; 
+            bottom: 40px; 
+            right: 40px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="time.html">Time Relativity</a>
+                        <a href="multiverse.html">Multiverse</a>
+                        <a href="observations.html">Observations</a>
+                        <a href="lightspeed.html">Light Speed</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: #00ffcc; color: #000; border: none; font-weight: 600;">Special Relativity</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Flow of Time</h1>
+        
+        <div class="data-panel">
+            <h2>Time Dilation Simulator</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">Observe how velocity warps the fabric of spacetime and slows down local time.</p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">VELOCITY (v)</span>
+                    <span id="vel-val" class="data-value highlight">0.00 c</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">LORENTZ FACTOR (γ)</span>
+                    <span id="gamma-val" class="data-value">1.000</span>
+                </div>
+                <div class="data-row" style="margin-top: 10px;">
+                    <span class="data-label" style="color: #0088ff;">EARTH CLOCK (Years)</span>
+                    <span id="earth-time" class="data-value" style="color: #0088ff;">0.00</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label" style="color: #00ffcc;">SHIP CLOCK (Years)</span>
+                    <span id="ship-time" class="data-value" style="color: #00ffcc;">0.00</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>ACCELERATE SHIP (% of Light Speed)</label>
+                <input type="range" id="velocity-slider" min="0" max="999" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>Δt' = Δt / √(1 - v²/c²)</div>
+        <div>γ = 1 / √(1 - v²/c²)</div>
+        <div style="margin-top: 10px; color: #00ffcc;">SPACETIME WARPING DETECTED</div>
+    </div>
+
+    <div id="controls-info">
+        DRAG TO ROTATE SPACETIME GRID<br>
+        SCROLL TO ZOOM
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+        scene.fog = new THREE.FogExp2(0x050510, 0.005);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 30, 80);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // Spacetime Grid
+        const gridSize = 200;
+        const gridDivisions = 40;
+        const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, 0x00ffcc, 0x004488);
+        gridHelper.position.y = -10;
+        
+        // Custom shader for grid warping
+        gridHelper.material.onBeforeCompile = (shader) => {
+            shader.uniforms.velocity = { value: 0.0 };
+            shader.vertexShader = `
+                uniform float velocity;
+                ${shader.vertexShader}
+            `.replace(
+                `#include <begin_vertex>`,
+                `
+                #include <begin_vertex>
+                // Warp grid based on velocity (simulating length contraction / spatial distortion)
+                float dist = length(position.xz);
+                float warp = smoothstep(0.0, 50.0, dist);
+                transformed.z *= 1.0 - (velocity * 0.5 * warp);
+                transformed.y -= velocity * 15.0 * exp(-dist*dist/400.0); // Dip in the center
+                `
+            );
+            gridHelper.material.userData.shader = shader;
+        };
+        scene.add(gridHelper);
+
+        // Clocks Setup (Using 3D Rings to represent flow of time)
+        function createClock(color, xPos, label) {
+            const group = new THREE.Group();
+            group.position.x = xPos;
+            
+            // Outer Ring
+            const outerGeo = new THREE.TorusGeometry(8, 0.2, 16, 64);
+            const outerMat = new THREE.MeshBasicMaterial({ color: 0x333344 });
+            const outer = new THREE.Mesh(outerGeo, outerMat);
+            group.add(outer);
+
+            // Time Tick Ring (Glow)
+            const tickGeo = new THREE.TorusGeometry(6, 0.5, 16, 64);
+            const tickMat = new THREE.MeshBasicMaterial({ 
+                color: color, 
+                transparent: true, 
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const tickRing = new THREE.Mesh(tickGeo, tickMat);
+            group.add(tickRing);
+
+            // Center Core
+            const coreGeo = new THREE.SphereGeometry(1.5, 32, 32);
+            const coreMat = new THREE.MeshBasicMaterial({ color: color });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            group.add(core);
+
+            // Particles indicating flow
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = [];
+            for(let i=0; i<100; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = 2 + Math.random() * 4;
+                pPos.push(r*Math.cos(angle), r*Math.sin(angle), (Math.random()-0.5)*2);
+            }
+            pGeo.setAttribute('position', new THREE.Float32BufferAttribute(pPos, 3));
+            const pMat = new THREE.PointsMaterial({color: color, size: 0.2, transparent: true, opacity: 0.5});
+            const particles = new THREE.Points(pGeo, pMat);
+            group.add(particles);
+
+            scene.add(group);
+            return { group, tickRing, particles, core };
+        }
+
+        const earthClock = createClock(0x0088ff, -15, "EARTH");
+        const shipClock = createClock(0x00ffcc, 15, "SHIP");
+
+        // Connecting Energy Beam (showing relativity)
+        const beamGeo = new THREE.CylinderGeometry(0.1, 0.1, 30, 8);
+        const beamMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1, blending: THREE.AdditiveBlending });
+        const beam = new THREE.Mesh(beamGeo, beamMat);
+        beam.rotation.z = Math.PI / 2;
+        scene.add(beam);
+
+        // UI Logic
+        const slider = document.getElementById('velocity-slider');
+        const velVal = document.getElementById('vel-val');
+        const gammaVal = document.getElementById('gamma-val');
+        const earthTimeEl = document.getElementById('earth-time');
+        const shipTimeEl = document.getElementById('ship-time');
+
+        let earthTime = 0;
+        let shipTime = 0;
+        let velocity = 0; // % of c
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            
+            controls.update();
+
+            // Calculate Relativity
+            velocity = slider.value / 1000; // 0.000 to 0.999
+            
+            // Lorentz Factor: gamma = 1 / sqrt(1 - v^2/c^2)
+            const vSq = velocity * velocity;
+            const gamma = 1 / Math.sqrt(1 - vSq);
+
+            // Update UI
+            velVal.textContent = (velocity).toFixed(3) + " c";
+            gammaVal.textContent = gamma.toFixed(3);
+
+            // Time flows
+            const baseTick = delta * 2.0; // 2 "years" per second visually
+            
+            earthTime += baseTick; // Earth time is constant for observer
+            shipTime += baseTick / gamma; // Ship time dilates (slows down)
+
+            earthTimeEl.textContent = earthTime.toFixed(2);
+            shipTimeEl.textContent = shipTime.toFixed(2);
+
+            // Visual Animations
+            // Earth Clock rotates at constant speed
+            earthClock.tickRing.rotation.z -= baseTick;
+            earthClock.particles.rotation.z -= baseTick * 0.5;
+            
+            // Ship Clock rotates SLOWER based on gamma
+            shipClock.tickRing.rotation.z -= (baseTick / gamma);
+            shipClock.particles.rotation.z -= (baseTick / gamma) * 0.5;
+
+            // Pulse cores
+            earthClock.core.scale.setScalar(1 + Math.sin(earthTime * 5) * 0.2);
+            shipClock.core.scale.setScalar(1 + Math.sin(shipTime * 5) * 0.2);
+
+            // Warp Grid
+            if (gridHelper.material.userData.shader) {
+                gridHelper.material.userData.shader.uniforms.velocity.value = velocity;
+            }
+
+            // Beam intensity changes with velocity
+            beamMat.opacity = 0.1 + (velocity * 0.5);
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

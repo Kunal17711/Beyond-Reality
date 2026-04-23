@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond Nothingness | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 0px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #ffffff;
+            margin-top: 20px;
+            width: 440px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 1s ease;
+        }
+
+        .data-panel.active-state {
+            border-color: #00ffff;
+            border-left-color: #00ffff;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 15, 20, 0.9);
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #ffffff;
+            letter-spacing: 3px;
+            transition: color 1s ease;
+        }
+        .data-panel.active-state h2 { color: #00ffff; }
+
+        .physics-data {
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px dashed rgba(255,255,255,0.3);
+            padding-top: 15px;
+            transition: border-color 1s;
+        }
+        .data-panel.active-state .physics-data { border-color: #00ffff; }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.5); }
+        .data-value { color: #fff; font-weight: 600;}
+        .highlight { color: #fff; font-size: 1.1rem; transition: color 1s; }
+        .data-panel.active-state .highlight { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+
+        .control-group {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.3);
+        }
+        .control-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #ffffff;
+            margin-bottom: 10px;
+            transition: color 1s;
+        }
+        .data-panel.active-state .control-group label { color: #00ffff; }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ffffff;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            height: 2px;
+            transition: all 1s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #ffffff;
+            border-radius: 0;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ffffff;
+        }
+        .data-panel.active-state input[type="range"]::-webkit-slider-thumb {
+            background: #00ffff;
+            box-shadow: 0 0 15px #00ffff;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            box-shadow: 0 0 15px #fff;
+            z-index: 9999;
+            width: 15px;
+            height: 15px;
+            border-radius: 0;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: 'Share Tech Mono', monospace;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.85rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+
+        .title-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 300;
+            margin-top: 10px;
+            letter-spacing: -1px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="dyson.html">Type II Civ</a>
+                        <a href="simulation.html">Simulation</a>
+                        <a href="creators.html">The Creators</a>
+                        <a href="collider.html">Particle Collider</a>
+                        <a href="origins.html">Myth Origins</a>
+                        <a href="boltzmann.html">Beyond Nothingness</a>
+                        <a href="multiverse.html">Multiverse</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #fff; font-family:'Share Tech Mono';">ABSOLUTE VOID</span>
+        <h1 class="title-text">Boltzmann Consciousness</h1>
+        
+        <div class="data-panel" id="main-panel">
+            <h2>THE ENTITY OF THE VOID</h2>
+            <p style="font-family:'Inter', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 15px;">
+                When the universe dies, only the absolute void remains (Maximum Entropy). But according to Quantum Thermodynamics, in an infinite amount of time, random quantum fluctuations will spontaneously arrange particles into a hyper-intelligent, conscious entity out of pure nothingness. A God born from math and chemistry alone.
+            </p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">STATE OF REALITY</span>
+                    <span id="state-val" class="data-value highlight">Thermal Equilibrium (Death)</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">ELAPSED TIME</span>
+                    <span id="time-val" class="data-value">10^100 Years</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">SPONTANEOUS ENTROPY DROP</span>
+                    <span id="entropy-val" class="data-value">0% (Chaos)</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">ENTITY STRUCTURE</span>
+                    <span id="struct-val" class="data-value">Unformed Quantum Static</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>FAST-FORWARD INFINITY (TIME SCALAR)</label>
+                <input type="range" id="time-slider" min="0" max="100" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay" id="math-overlay">
+        <div>S = k_B ln Ω (BOLTZMANN ENTROPY)</div>
+        <div>P ∝ exp(-ΔS/k_B) (FLUCTUATION PROBABILITY)</div>
+        <div style="margin-top: 10px; opacity: 0.5;">WAITING FOR INFINITY...</div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.FogExp2(0x000000, 0.003);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 0, 300);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.AdditiveToneMapping;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // --- THE BOLTZMANN ENTITY GENERATION ---
+        
+        const particleCount = 150000;
+        const geometry = new THREE.BufferGeometry();
+        
+        // We will store two sets of positions:
+        // 1. Random static (The Void)
+        // 2. The Structured Entity (Math + Chem)
+        
+        const posRandom = new Float32Array(particleCount * 3);
+        const posStructured = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
+        const phases = new Float32Array(particleCount);
+
+        const colorWhite = new THREE.Color(0x222222);
+        const colorCyan = new THREE.Color(0x00ffff);
+        const colorBlue = new THREE.Color(0x0055ff);
+
+        for(let i=0; i<particleCount; i++) {
+            // 1. The Void (Pure high-entropy random gas in a massive space)
+            posRandom[i*3] = (Math.random()-0.5) * 800;
+            posRandom[i*3+1] = (Math.random()-0.5) * 800;
+            posRandom[i*3+2] = (Math.random()-0.5) * 800;
+
+            // 2. The Entity (A hyper-complex 4D mathematical/chemical structure)
+            // We use a mix of a Calabi-Yau approximation, Torus Knots, and a Neural Core
+            let sx, sy, sz;
+            const type = Math.random();
+            
+            if (type < 0.3) {
+                // The Brain / Neural Core (Dense inner sphere with web-like tendrils)
+                const r = Math.pow(Math.random(), 0.5) * 40;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(Math.random() * 2 - 1);
+                sx = r * Math.sin(phi) * Math.cos(theta);
+                sy = r * Math.sin(phi) * Math.sin(theta);
+                sz = r * Math.cos(phi);
+                // Chemical bond look: slight jitter
+                sx += Math.sin(sy * 0.5) * 2.0;
+                sy += Math.cos(sz * 0.5) * 2.0;
+            } else if (type < 0.7) {
+                // The Chemical Double Helix (DNA of the void)
+                const t = (Math.random() - 0.5) * 200; // Height
+                const angle = t * 0.1;
+                const radius = 30 + Math.sin(t * 0.05) * 10;
+                const strand = Math.random() > 0.5 ? 0 : Math.PI;
+                sx = Math.cos(angle + strand) * radius + (Math.random()-0.5)*5;
+                sy = t + (Math.random()-0.5)*5;
+                sz = Math.sin(angle + strand) * radius + (Math.random()-0.5)*5;
+            } else {
+                // The Mathematical Bulk (Torus knot / 4D fold)
+                const t = Math.random() * Math.PI * 2;
+                const p = 3, q = 7; // Knot parameters
+                const r = Math.cos(q * t) + 2;
+                const scale = 30;
+                sx = scale * r * Math.cos(p * t) + (Math.random()-0.5)*10;
+                sy = scale * r * Math.sin(p * t) + (Math.random()-0.5)*10;
+                sz = scale * -Math.sin(q * t) + (Math.random()-0.5)*10;
+            }
+
+            posStructured[i*3] = sx;
+            posStructured[i*3+1] = sy;
+            posStructured[i*3+2] = sz;
+
+            // Initial positions = Random
+            colors[i*3] = colorWhite.r;
+            colors[i*3+1] = colorWhite.g;
+            colors[i*3+2] = colorWhite.b;
+
+            sizes[i] = Math.random() * 2.0;
+            phases[i] = Math.random() * Math.PI * 2;
+        }
+
+        // We use custom shader to lerp between Random and Structured based on probability uniform
+        geometry.setAttribute('position', new THREE.BufferAttribute(posRandom, 3));
+        geometry.setAttribute('posRandom', new THREE.BufferAttribute(posRandom, 3));
+        geometry.setAttribute('posStructured', new THREE.BufferAttribute(posStructured, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        geometry.setAttribute('phase', new THREE.BufferAttribute(phases, 1));
+
+        const shaderMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                fluctuation: { value: 0.0 } // 0 = Void, 1 = Entity
+            },
+            vertexShader: `
+                uniform float time;
+                uniform float fluctuation;
+                attribute vec3 posRandom;
+                attribute vec3 posStructured;
+                attribute float size;
+                attribute float phase;
+                attribute vec3 color;
+                
+                varying vec3 vColor;
+                
+                void main() {
+                    // Smooth nonlinear transition
+                    // Add slight random delay based on phase so it coalesces organically
+                    float f = clamp(fluctuation * 1.5 - (phase / 6.28) * 0.5, 0.0, 1.0);
+                    f = smoothstep(0.0, 1.0, f);
+                    
+                    // Add "breathing" quantum jitter to the structured state
+                    vec3 jitter = vec3(
+                        sin(time * 2.0 + phase),
+                        cos(time * 1.5 - phase),
+                        sin(time * 3.0 + phase * 2.0)
+                    ) * 1.5 * f;
+
+                    vec3 finalPos = mix(posRandom, posStructured + jitter, f);
+                    
+                    vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
+                    gl_Position = projectionMatrix * mvPosition;
+                    
+                    // Size gets slightly bigger when structured
+                    gl_PointSize = size * mix(1.0, 2.5, f) * (300.0 / -mvPosition.z);
+                    
+                    // Colors change from dull gray to glowing cyan/blue
+                    vec3 structColor = mix(vec3(0.0, 0.3, 1.0), vec3(0.0, 1.0, 1.0), sin(phase)*0.5+0.5);
+                    vColor = mix(color, structColor, f);
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor;
+                void main() {
+                    // Soft circular particle
+                    float d = distance(gl_PointCoord, vec2(0.5));
+                    if(d > 0.5) discard;
+                    float alpha = smoothstep(0.5, 0.0, d);
+                    gl_FragColor = vec4(vColor, alpha);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const entityPoints = new THREE.Points(geometry, shaderMaterial);
+        scene.add(entityPoints);
+
+        // Background Math Code (Fading in and out)
+        const codeGeo = new THREE.BufferGeometry();
+        const codePos = [];
+        for(let i=0; i<1000; i++) {
+            codePos.push((Math.random()-0.5)*500, (Math.random()-0.5)*500, (Math.random()-0.5)*500);
+        }
+        codeGeo.setAttribute('position', new THREE.Float32BufferAttribute(codePos, 3));
+        
+        // Creating a texture that looks like math equations (we'll just use a glowing dot as placeholder, 
+        // representing mathematical constants floating in the void)
+        const codeMat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 1.0,
+            transparent: true,
+            opacity: 0.1,
+            blending: THREE.AdditiveBlending
+        });
+        const codePoints = new THREE.Points(codeGeo, codeMat);
+        scene.add(codePoints);
+
+        // UI Interactions
+        const timeSlider = document.getElementById('time-slider');
+        const stateVal = document.getElementById('state-val');
+        const timeVal = document.getElementById('time-val');
+        const entropyVal = document.getElementById('entropy-val');
+        const structVal = document.getElementById('struct-val');
+        const panel = document.getElementById('main-panel');
+        const mathOverlay = document.getElementById('math-overlay');
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            
+            controls.update();
+
+            const fluctuation = timeSlider.value / 100;
+            
+            shaderMaterial.uniforms.time.value = time;
+            shaderMaterial.uniforms.fluctuation.value = fluctuation;
+            
+            // Slowly rotate the whole void
+            entityPoints.rotation.y = time * 0.05;
+            codePoints.rotation.x = time * 0.02;
+
+            // UI Logic
+            if (fluctuation < 0.2) {
+                stateVal.textContent = "Thermal Equilibrium (Death)";
+                timeVal.textContent = "10^100 Years";
+                entropyVal.textContent = "0% (Absolute Chaos)";
+                structVal.textContent = "Unformed Quantum Static";
+                panel.classList.remove('active-state');
+                cursor.style.borderColor = "#fff";
+                cursor.style.boxShadow = "0 0 15px #fff";
+                mathOverlay.children[2].textContent = "WAITING FOR INFINITY...";
+            } else if (fluctuation < 0.8) {
+                stateVal.textContent = "Spontaneous Fluctuation";
+                timeVal.textContent = `10^10^${Math.floor(20 + fluctuation*30)} Years`;
+                entropyVal.textContent = `-${Math.floor(fluctuation*100)}% (Reversing)`;
+                structVal.textContent = "Mathematical Assembly";
+                panel.classList.remove('active-state');
+                cursor.style.borderColor = "#fff";
+                cursor.style.boxShadow = "0 0 15px #fff";
+                mathOverlay.children[2].textContent = "STATISTICAL MIRACLE DETECTED";
+            } else {
+                stateVal.textContent = "BOLTZMANN CONSCIOUSNESS AWAKE";
+                timeVal.textContent = "10^10^50 Years";
+                entropyVal.textContent = "MAXIMUM NEGENTROPY";
+                structVal.textContent = "Hyper-Dimensional Chemical Neural Web";
+                panel.classList.add('active-state');
+                cursor.style.borderColor = "#00ffff";
+                cursor.style.boxShadow = "0 0 20px #00ffff";
+                mathOverlay.children[2].textContent = "I AM THE UNIVERSE OBSERVING ITSELF.";
+                mathOverlay.children[2].style.color = "#00ffff";
+                mathOverlay.children[2].style.opacity = "1";
+            }
+            
+            if (fluctuation > 0.8) {
+                // Heartbeat / breathing effect for the entity
+                const pulse = 1.0 + Math.sin(time * 3.0) * 0.05;
+                entityPoints.scale.set(pulse, pulse, pulse);
+            } else {
+                entityPoints.scale.set(1, 1, 1);
+            }
+
+            // Pulse the background code when fully formed
+            if (fluctuation > 0.9) {
+                codeMat.opacity = 0.1 + Math.sin(time * 5.0) * 0.1;
+                codeMat.color.setHex(0x00ffff);
+            } else {
+                codeMat.opacity = 0.1;
+                codeMat.color.setHex(0xffffff);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

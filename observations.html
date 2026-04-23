@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observations | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li><a href="multiverse.html">Multiverse</a></li>
+                <li><a href="observations.html">Observations</a></li>
+                <li><a href="lightspeed.html">Light Speed</a></li>
+                <li><button class="theme-toggle" id="theme-toggle">🌓</button></li>
+                <li><a href="explore.html" class="btn-primary">Join Research</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="hero" class="subpage-hero">
+        <div class="hero-content">
+            <h1 class="reveal-text">Observations</h1>
+            <p class="subtitle reveal-text-delay">A chronological feed of findings from the edge.</p>
+        </div>
+        <div class="hero-bg-wrapper">
+            <img src="observations-bg.png" alt="Data points background" class="hero-bg">
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <div class="observations-layout">
+                    <aside class="research-sidebar reveal">
+                        <h3>Research Filter</h3>
+                        <div class="filter-group">
+                            <label>Domain</label>
+                            <ul class="filter-list">
+                                <li class="active"><a href="observations.html">All Observations</a></li>
+                                <li><a href="cmb.html">CMB Anomalies</a></li>
+                                <li><a href="void.html">Theoretical Void</a></li>
+                                <li><a href="physics.html">Horizon Physics</a></li>
+                            </ul>
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <ul class="filter-list">
+                                <li>Verified</li>
+                                <li>Hypothetical</li>
+                                <li>In Peer Review</li>
+                            </ul>
+                        </div>
+                        <div class="live-data-box glass">
+                            <label>Incoming Data Stream</label>
+                            <div id="live-feed" class="live-feed">
+                                <div class="feed-entry">Initializing connection...</div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <div class="notes-grid">
+                        <article class="note-card full-width reveal">
+                            <div class="note-header">
+                                <span class="date">April 20, 2026</span>
+                                <span class="tag">Breaking</span>
+                            </div>
+                            <h3>The Phase Shift Anomaly: Sector 7 Analysis</h3>
+                            <p>Recent data suggests a non-linear shift in the cosmic microwave background at the localized coordinates of Sector 7. The resonance pattern does not match any known stellar phenomenon, leading our team to hypothesize a "Brane Leakage" from a higher-dimensional proximity.</p>
+                            <div class="entry-meta">
+                                <span>Researcher: Dr. Elena Voss</span>
+                                <span>Certainty: 68%</span>
+                            </div>
+                            <a href="#" class="read-more">Download Full Dataset (JSON)</a>
+                        </article>
+
+                        <article class="note-card reveal">
+                            <div class="note-header">
+                                <span class="date">April 05, 2026</span>
+                            </div>
+                            <h3>Recalculating Dark Flow Vectors</h3>
+                            <p>Large-scale motion of galaxy clusters is now observed at 1,000 km/s—accelerating beyond previous models. The destination remains a point 12 billion light years outside our observable horizon.</p>
+                        </article>
+
+                        <article class="note-card reveal">
+                            <div class="note-header">
+                                <span class="date">March 22, 2026</span>
+                            </div>
+                            <h3>Quantum Entanglement across Event Horizons</h3>
+                            <p>Successful simulation of non-local correlation between particles on either side of a theoretical Schwarzschild boundary. This suggests information may be recoverable from the "Other Side."</p>
+                        </article>
+
+                        <article class="note-card reveal">
+                            <div class="note-header">
+                                <span class="date">Feb 28, 2026</span>
+                            </div>
+                            <h3>The Static Void Hypothesis</h3>
+                            <p>Observation of "frozen" photons at the extreme edge of detection suggests a state where the fundamental arrow of time ceases to function as a linear vector.</p>
+                        </article>
+
+                        <article class="note-card reveal">
+                            <div class="note-header">
+                                <span class="date">Jan 15, 2026</span>
+                            </div>
+                            <h3>Detection of Non-Baryonic Resonance</h3>
+                            <p>A series of high-frequency ripples detected by the Horizon Array. The spectral signature is unlike dark matter or any known particle decay.</p>
+                        </article>
+
+                        <article class="note-card reveal">
+                            <div class="note-header">
+                                <span class="date">Dec 05, 2025</span>
+                            </div>
+                            <h3>Void Thermodynamics</h3>
+                            <p>Analysis of energy dissipation at the boundary layer. The data suggests the "Beyond" may have a temperature of absolute zero, yet contains infinite potential energy.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 Beyond Platform. All rights reserved.</p>
+                <div class="socials">
+                    <a href="observations.html">Observations</a>
+                    <a href="manifesto.html">Manifesto</a>
+                    <a href="explore.html">Join Research</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

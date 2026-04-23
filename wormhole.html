@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einstein-Rosen Bridge | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #bd00ff;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); }
+        .data-value { color: #fff; font-weight: 600; font-size: 1rem;}
+        .data-value.highlight { color: #bd00ff; font-size: 1.1rem; }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+        .control-group label {
+            display: block;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #bd00ff;
+        }
+
+        #controls-info { 
+            position: absolute; 
+            bottom: 40px; 
+            right: 40px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+        
+        /* Glitch effect for instability */
+        .glitch {
+            animation: glitch-anim 0.2s linear infinite;
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="time.html">Time Relativity</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="multiverse.html">Multiverse</a>
+                        <a href="observations.html">Observations</a>
+                        <a href="lightspeed.html">Light Speed</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: #bd00ff; color: #fff; border: none; font-weight: 600;">Spacetime Fold</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Wormhole Traverse</h1>
+        
+        <div class="data-panel">
+            <h2>Einstein-Rosen Bridge</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">Navigating the throat of a stabilized spacetime wormhole connecting two distant cosmic sectors.</p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">EXOTIC MASS (Negative)</span>
+                    <span id="mass-val" class="data-value highlight">-4.5 × 10^30 kg</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">THROAT RADIUS</span>
+                    <span id="radius-val" class="data-value">12.5 km</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">STABILITY</span>
+                    <span id="stab-val" class="data-value" style="color:#00ffcc;">98.2%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">TRAVERSE SPEED</span>
+                    <span id="speed-val" class="data-value">0.12 c</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>EXOTIC ENERGY INJECTION (THROTTLE)</label>
+                <input type="range" id="speed-slider" min="1" max="100" value="10">
+            </div>
+            <div class="control-group">
+                <label>SPACETIME TURBULENCE</label>
+                <input type="range" id="turb-slider" min="0" max="100" value="20">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>ds² = -e^(2Φ(r))c²dt² + dr²/(1 - b(r)/r) + r²dΩ²</div>
+        <div>MORRIS-THORNE METRIC: STABLE</div>
+        <div style="margin-top: 10px; color: #bd00ff;">NAVIGATING HIGHER DIMENSIONAL BULK</div>
+    </div>
+
+    <div id="controls-info">
+        MOUSE TO STEER THROUGH THE THROAT<br>
+        MAINTAIN CENTER TRAJECTORY
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Normalized coordinates -1 to 1
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.FogExp2(0x000000, 0.015);
+        
+        const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Generate Wormhole Path (A twisting 3D curve)
+        class CustomSinCurve extends THREE.Curve {
+            constructor(scale = 1) {
+                super();
+                this.scale = scale;
+            }
+            getPoint(t, optionalTarget = new THREE.Vector3()) {
+                const tx = t * 10 - 1.5;
+                const ty = Math.sin(2 * Math.PI * t) * 0.5;
+                const tz = Math.cos(2 * Math.PI * t) * 0.5;
+                // Add some twisting
+                const x = Math.sin(t * Math.PI * 4) * 20;
+                const y = Math.cos(t * Math.PI * 3) * 20;
+                const z = t * 400; // Length of the wormhole
+                return optionalTarget.set(x, y, z).multiplyScalar(this.scale);
+            }
+        }
+
+        const path = new CustomSinCurve(1);
+        const tubeGeo = new THREE.TubeGeometry(path, 400, 5, 32, false); // Closed=false
+
+        // High-end Quantum/Energy Shader for the Wormhole Walls
+        const wormholeVertexShader = `
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            
+            void main() {
+                vUv = uv;
+                vPosition = position;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const wormholeFragmentShader = `
+            uniform float time;
+            uniform float speed;
+            uniform float turbulence;
+            uniform float opacityMultiplier;
+            
+            varying vec2 vUv;
+            varying vec3 vPosition;
+
+            // Simplex Noise 
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1;
+                i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m;
+                m = m*m;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                // vUv.x is along the length of the tube
+                // vUv.y is around the circumference of the tube
+                
+                // Animate texture along the tube to simulate movement
+                vec2 uv = vUv;
+                uv.x = uv.x * 20.0 - time * speed * 2.0;
+                uv.y = uv.y * 10.0 + time * 0.5;
+
+                // Create complex energy bands
+                float n1 = snoise(uv * vec2(1.0, 2.0) + time * 0.1);
+                float n2 = snoise(uv * vec2(4.0, 1.0) - time * 0.2);
+                
+                // Add turbulence from UI
+                float t = (n1 * 0.5 + 0.5) * (n2 * 0.5 + 0.5);
+                t += snoise(uv * 10.0) * (turbulence * 0.5);
+                
+                // Grid lines (Spacetime metric)
+                float gridX = abs(fract(vUv.x * 100.0) - 0.5);
+                float gridY = abs(fract(vUv.y * 20.0) - 0.5);
+                float grid = (1.0 - smoothstep(0.0, 0.05, gridX)) + (1.0 - smoothstep(0.0, 0.05, gridY));
+                
+                // Colors
+                vec3 colorDark = vec3(0.02, 0.0, 0.05);
+                vec3 colorMid = vec3(0.3, 0.0, 0.8);
+                vec3 colorBright = vec3(0.8, 0.2, 1.0);
+                vec3 colorEnergy = vec3(0.0, 1.0, 1.0); // Cyan highlights
+
+                vec3 finalColor = mix(colorDark, colorMid, smoothstep(0.0, 0.4, t));
+                finalColor = mix(finalColor, colorBright, smoothstep(0.4, 0.8, t));
+                
+                // Add cyan energy flashes at high turbulence
+                if (t > 0.8) {
+                    finalColor = mix(finalColor, colorEnergy, smoothstep(0.8, 1.0, t));
+                }
+
+                // Add Grid
+                finalColor += vec3(0.5, 0.0, 1.0) * grid * 0.3;
+
+                // Make the dark parts semi-transparent
+                float alpha = mix(0.1, 0.9, smoothstep(0.2, 0.6, t));
+                alpha += grid * 0.5; 
+                
+                gl_FragColor = vec4(finalColor, min(1.0, alpha) * opacityMultiplier);
+            }
+        `;
+
+        const uniforms = {
+            time: { value: 0.0 },
+            speed: { value: 1.0 },
+            turbulence: { value: 0.2 },
+            opacityMultiplier: { value: 1.0 }
+        };
+
+        const tubeMat = new THREE.ShaderMaterial({
+            vertexShader: wormholeVertexShader,
+            fragmentShader: wormholeFragmentShader,
+            uniforms: uniforms,
+            side: THREE.BackSide, // ONLY render the inside! This fixes the weird "outside tube" look.
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const wormhole = new THREE.Mesh(tubeGeo, tubeMat);
+        scene.add(wormhole);
+
+        // --- EXTERNAL GROUPS ---
+        const spaceAGroup = new THREE.Group();
+        scene.add(spaceAGroup);
+        const spaceBGroup = new THREE.Group();
+        scene.add(spaceBGroup);
+
+        // --- SPACE A (NORMAL SPACE) ---
+        const aStarGeo = new THREE.BufferGeometry();
+        const aStarPos = [];
+        for(let i=0; i<5000; i++) {
+            aStarPos.push((Math.random()-0.5)*1000, (Math.random()-0.5)*1000, (Math.random() - 0.5)*1000);
+        }
+        aStarGeo.setAttribute('position', new THREE.Float32BufferAttribute(aStarPos, 3));
+        const aStarMat = new THREE.PointsMaterial({color: 0xffffff, size: 0.8, transparent: true, opacity: 1.0});
+        const aStars = new THREE.Points(aStarGeo, aStarMat);
+        spaceAGroup.add(aStars);
+
+        // WORMHOLE ENTRANCE PORTAL
+        const startPoint = path.getPoint(0.0);
+        // We position Space A around the entrance
+        spaceAGroup.position.copy(startPoint);
+        
+        // A glowing spherical void representing the entrance
+        const entranceGeo = new THREE.SphereGeometry(15, 64, 64);
+        const entranceMat = new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 1.0});
+        const entrancePortal = new THREE.Mesh(entranceGeo, entranceMat);
+        // Move it slightly forward so we hit it exactly at progress 0
+        entrancePortal.position.set(0, 0, 0); 
+        spaceAGroup.add(entrancePortal);
+
+        // Glowing ring around entrance
+        const entRingGeo = new THREE.RingGeometry(15, 25, 64);
+        const entRingMat = new THREE.MeshBasicMaterial({color: 0xbd00ff, transparent: true, opacity: 0.8, side: THREE.DoubleSide, blending: THREE.AdditiveBlending});
+        const entRing = new THREE.Mesh(entRingGeo, entRingMat);
+        entRing.position.set(0, 0, 0);
+        spaceAGroup.add(entRing);
+
+        // --- SPACE B (ALIEN GALAXY) ---
+        const endPoint = path.getPoint(1.0);
+        spaceBGroup.position.copy(endPoint);
+
+        const bStarGeo = new THREE.BufferGeometry();
+        const bStarPos = [];
+        const bStarColors = [];
+        for(let i=0; i<10000; i++) {
+            bStarPos.push((Math.random()-0.5)*1500, (Math.random()-0.5)*1500, (Math.random() - 0.5)*1500);
+            const color = new THREE.Color();
+            color.setHSL(0.3 + Math.random() * 0.2, 1.0, 0.5); // Green/Cyan alien stars
+            bStarColors.push(color.r, color.g, color.b);
+        }
+        bStarGeo.setAttribute('position', new THREE.Float32BufferAttribute(bStarPos, 3));
+        bStarGeo.setAttribute('color', new THREE.Float32BufferAttribute(bStarColors, 3));
+        const bStarMat = new THREE.PointsMaterial({size: 1.5, vertexColors: true, transparent: true, opacity: 0.0, blending: THREE.AdditiveBlending});
+        const bStars = new THREE.Points(bStarGeo, bStarMat);
+        spaceBGroup.add(bStars);
+
+        // Alien Binary Star in Space B
+        const sunGeo = new THREE.SphereGeometry(60, 32, 32);
+        const sunMat = new THREE.MeshBasicMaterial({color: 0x00ff88, transparent: true, opacity: 0.0});
+        const sun = new THREE.Mesh(sunGeo, sunMat);
+        sun.position.set(200, 100, 400); // Placed in Space B's local coordinates
+        spaceBGroup.add(sun);
+
+        // Glow around alien sun
+        const sunGlowGeo = new THREE.PlaneGeometry(400, 400);
+        const sunGlowMat = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.0,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide
+        });
+        const sunGlow = new THREE.Mesh(sunGlowGeo, sunGlowMat);
+        sunGlow.position.copy(sun.position);
+        spaceBGroup.add(sunGlow);
+
+        // WORMHOLE EXIT PORTAL (WHITE HOLE)
+        const exitGeo = new THREE.SphereGeometry(15, 64, 64);
+        const exitMat = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.0, blending: THREE.AdditiveBlending});
+        const exitPortal = new THREE.Mesh(exitGeo, exitMat);
+        exitPortal.position.set(0, 0, 0);
+        spaceBGroup.add(exitPortal);
+
+
+        // --- INTERNAL THROAT PARTICLES ---
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = [];
+        for(let i=0; i<3000; i++) {
+            const t = Math.random();
+            const point = path.getPoint(t);
+            const radius = Math.random() * 3.5; 
+            const angle = Math.random() * Math.PI * 2;
+            pPos.push(
+                point.x + Math.cos(angle) * radius,
+                point.y + Math.sin(angle) * radius,
+                point.z + (Math.random()-0.5)*10
+            );
+        }
+        pGeo.setAttribute('position', new THREE.Float32BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({
+            color: 0x00ffff, 
+            size: 0.15, 
+            transparent: true, 
+            opacity: 0.0, // Start invisible
+            blending: THREE.AdditiveBlending
+        });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+
+        // UI Logic
+        const speedSlider = document.getElementById('speed-slider');
+        const turbSlider = document.getElementById('turb-slider');
+        const speedVal = document.getElementById('speed-val');
+        const stabVal = document.getElementById('stab-val');
+
+        // Animation Loop
+        let progress = -0.10; // Start approaching the wormhole
+        let camOffset = new THREE.Vector2(0, 0);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Get speed from slider
+            const baseSpeed = speedSlider.value / 100000;
+            const turb = turbSlider.value / 100;
+            
+            // Update Uniforms
+            uniforms.time.value += 0.01;
+            uniforms.speed.value = (speedSlider.value / 100) * 5.0;
+            uniforms.turbulence.value = turb;
+
+            // Move camera
+            progress += baseSpeed;
+            
+            // Loop sequence
+            if (progress >= 1.2) {
+                progress = -0.10; 
+                // Reset opacities quickly
+                bStarMat.opacity = 0;
+                sunMat.opacity = 0;
+                sunGlowMat.opacity = 0;
+                exitMat.opacity = 0;
+            }
+
+            // Path calculation
+            // We clamp progress between 0 and 1 ONLY for the tube shape calculation
+            const clampedProgress = Math.max(0, Math.min(1.0, progress));
+            const point = path.getPoint(clampedProgress);
+            const lookPoint = path.getPoint(Math.min(1.0, clampedProgress + 0.01));
+
+            // If we are before 0, extrapolate backwards linearly
+            if (progress < 0) {
+                const dir = new THREE.Vector3().subVectors(lookPoint, point).normalize();
+                point.addScaledVector(dir, progress * 400); // 400 is approx tube length scale
+                lookPoint.addScaledVector(dir, progress * 400);
+            }
+            // If we are past 1, extrapolate forwards linearly
+            if (progress > 1.0) {
+                const prevPoint = path.getPoint(0.99);
+                const dir = new THREE.Vector3().subVectors(point, prevPoint).normalize();
+                point.addScaledVector(dir, (progress - 1.0) * 400);
+                lookPoint.addScaledVector(dir, (progress - 1.0) * 400);
+            }
+
+            // Camera offset based on mouse (steering)
+            camOffset.x += (mouseX * 5 - camOffset.x) * 0.05;
+            camOffset.y += (mouseY * 5 - camOffset.y) * 0.05;
+
+            camera.position.set(point.x + camOffset.x, point.y + camOffset.y, point.z);
+            camera.lookAt(lookPoint.x, lookPoint.y, lookPoint.z);
+
+            // --- FADE LOGIC (THE MAGIC) ---
+            
+            // Space A fades out as we enter (progress goes 0 -> 0.05)
+            const aFade = 1.0 - Math.min(1.0, Math.max(0.0, progress * 20.0));
+            aStarMat.opacity = aFade;
+            entranceMat.opacity = aFade;
+            entRingMat.opacity = aFade * 0.8;
+            
+            // Wormhole Tube and Particles fade in as we enter, fade out as we exit
+            let tubeFade = 0.0;
+            if (progress > 0.0 && progress < 1.0) {
+                tubeFade = 1.0;
+                // Fade at edges
+                if (progress < 0.05) tubeFade = progress * 20.0;
+                if (progress > 0.95) tubeFade = (1.0 - progress) * 20.0;
+            }
+            uniforms.opacityMultiplier.value = tubeFade;
+            pMat.opacity = tubeFade * 0.6;
+
+            // Space B fades in as we exit (progress goes 0.95 -> 1.0)
+            let bFade = 0.0;
+            if (progress > 0.95) {
+                bFade = (progress - 0.95) * 20.0;
+            }
+            if (progress > 1.0) bFade = 1.0;
+            
+            bStarMat.opacity = bFade;
+            sunMat.opacity = bFade;
+            sunGlowMat.opacity = bFade * 0.5;
+            exitMat.opacity = Math.max(0, 1.0 - Math.abs(progress - 1.0)*10.0); // Exit portal flashes white quickly
+            
+            // Sun faces camera
+            sunGlow.lookAt(camera.position);
+            entRing.lookAt(camera.position);
+
+            // Hide/Show UI depending on where we are
+            if (progress < 0.0 || progress > 1.0) {
+                document.getElementById('ui-overlay').style.opacity = '0';
+                document.getElementById('controls-info').style.opacity = '0';
+            } else {
+                document.getElementById('ui-overlay').style.opacity = '1';
+                document.getElementById('controls-info').style.opacity = '1';
+            }
+
+            // Animate particles slowly
+            particles.rotation.z += 0.001;
+            
+            // Slowly rotate external universes
+            spaceAGroup.rotation.z += 0.0005;
+            spaceBGroup.rotation.z += 0.0002;
+
+            // UI Updates
+            speedVal.textContent = ((speedSlider.value / 100) * 1.5).toFixed(2) + " c";
+            
+            // Stability decreases if steering too far off center or turbulence high
+            const offCenter = Math.sqrt(camOffset.x*camOffset.x + camOffset.y*camOffset.y);
+            let stability = 100 - (turb * 30) - (offCenter * 5);
+            if (stability < 0) stability = 0;
+            stabVal.textContent = stability.toFixed(1) + "%";
+            
+            if (stability < 50 && progress >= 0.0 && progress <= 1.0) {
+                stabVal.style.color = "#ff3333";
+                document.getElementById('ui-overlay').classList.add('glitch');
+            } else {
+                stabVal.style.color = "#00ffcc";
+                document.getElementById('ui-overlay').classList.remove('glitch');
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

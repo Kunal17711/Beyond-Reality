@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Megastructures | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(10, 15, 20, 0.85);
+            backdrop-filter: blur(25px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            margin-top: 20px;
+            width: 440px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9), 0 0 20px rgba(255, 204, 0, 0.1);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #ffcc00;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); }
+        .data-value { color: #fff; font-weight: 600; font-size: 0.95rem;}
+        .data-value.highlight { color: #ffcc00; font-size: 1.2rem; }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+        .control-group label {
+            display: block;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ffcc00;
+        }
+
+        #controls-info { 
+            position: absolute; 
+            bottom: 40px; 
+            right: 40px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+        
+        .kardashev-scale {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .k-bar-container {
+            flex-grow: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .k-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff3366, #ffcc00);
+            width: 10%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="dyson.html">Type II Civ</a>
+                        <a href="time.html">Time Relativity</a>
+                        <a href="multiverse.html">Multiverse</a>
+                        <a href="lightspeed.html">Light Speed</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: #ffcc00; color: #000; border: none; font-weight: 600;">Advanced Civilizations</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Dyson Sphere</h1>
+        
+        <div class="data-panel">
+            <h2>Stellar Megastructure</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">A hypothetical megastructure that completely encompasses a star to capture its entire power output. The ultimate goal of a Type II Kardashev Civilization.</p>
+            
+            <div class="kardashev-scale">
+                <span style="font-size: 0.7rem; color: #ff3366; font-weight: bold;">TYPE I</span>
+                <div class="k-bar-container"><div class="k-bar" id="k-bar"></div></div>
+                <span style="font-size: 0.7rem; color: #ffcc00; font-weight: bold;">TYPE II</span>
+            </div>
+
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">CIVILIZATION TYPE</span>
+                    <span id="k-val" class="data-value highlight">1.10 (Planetary)</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">CONSTRUCTION PHASE</span>
+                    <span id="phase-val" class="data-value">Swarm Initiation</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">POWER HARVESTED</span>
+                    <span id="power-val" class="data-value" style="color:#00ffcc;">2.5 × 10¹⁷ Watts</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">STELLAR LUMINOSITY CAPTURED</span>
+                    <span id="cap-val" class="data-value">0.0001%</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>PROGRESS CIVILIZATION TIMELINE (100,000 YEARS)</label>
+                <input type="range" id="time-slider" min="10" max="200" value="10">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>K = (log₁₀(P) - 6) / 10</div>
+        <div>P_star = 3.828 × 10²⁶ W (Solar Mass)</div>
+        <div style="margin-top: 10px; color: #ffcc00;">DYSON SWARM DYNAMICS ACTIVE</div>
+    </div>
+
+    <div id="controls-info">
+        DRAG TO ROTATE MEGASTRUCTURE<br>
+        SCROLL TO ZOOM
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020205);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
+        camera.position.set(0, 150, 400);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+        controls.maxDistance = 1000;
+        controls.minDistance = 100;
+
+        // --- THE STAR ---
+        const starGroup = new THREE.Group();
+        scene.add(starGroup);
+
+        // Core
+        const sunGeo = new THREE.SphereGeometry(40, 64, 64);
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffffee });
+        const sun = new THREE.Mesh(sunGeo, sunMat);
+        starGroup.add(sun);
+
+        // Corona Glow
+        const glowGeo = new THREE.PlaneGeometry(300, 300);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0xffaa00,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            map: createRadialGradient()
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        starGroup.add(glow);
+
+        function createRadialGradient() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.2, 'rgba(255, 200, 50, 0.8)');
+            grad.addColorStop(1, 'rgba(255, 100, 0, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 256, 256);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // --- DYSON SWARM (SATELLITES) ---
+        // We use InstancedMesh for thousands of solar collectors
+        const swarmCount = 20000;
+        const satGeo = new THREE.BoxGeometry(0.8, 0.1, 0.8);
+        const satMat = new THREE.MeshStandardMaterial({
+            color: 0x444455,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: 0x000000
+        });
+        const swarm = new THREE.InstancedMesh(satGeo, satMat, swarmCount);
+        
+        const dummy = new THREE.Object3D();
+        const swarmData = []; // Store orbit params
+
+        for (let i = 0; i < swarmCount; i++) {
+            const r = 60 + Math.random() * 100;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(Math.random() * 2 - 1);
+            
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
+
+            // Orbit speeds
+            const speed = (0.5 + Math.random() * 1.5) * (Math.random() > 0.5 ? 1 : -1);
+            // Axis of rotation for this satellite
+            const axis = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
+            
+            swarmData.push({ r, theta, phi, speed, axis });
+
+            dummy.position.set(x, y, z);
+            dummy.lookAt(0,0,0); // Face the star to collect energy
+            dummy.updateMatrix();
+            swarm.setMatrixAt(i, dummy.matrix);
+            
+            // Start completely invisible (scale 0)
+            swarm.setColorAt(i, new THREE.Color(0x333333));
+        }
+        scene.add(swarm);
+
+        // --- DYSON SPHERE SHELL (ADVANCED PHASE) ---
+        // A geodesic sphere that pieces together
+        const shellRadius = 80;
+        const shellGeo = new THREE.IcosahedronGeometry(shellRadius, 4); // High detail
+        
+        // We make a wireframe lattice that glows
+        const wireMat = new THREE.MeshBasicMaterial({
+            color: 0xffcc00,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.0,
+            blending: THREE.AdditiveBlending
+        });
+        const shellWire = new THREE.Mesh(shellGeo, wireMat);
+        scene.add(shellWire);
+
+        // Solid panels that cover the star
+        const panelMat = new THREE.MeshStandardMaterial({
+            color: 0x222222,
+            metalness: 0.8,
+            roughness: 0.4,
+            transparent: true,
+            opacity: 0.0,
+            side: THREE.DoubleSide
+        });
+        const shellSolid = new THREE.Mesh(shellGeo, panelMat);
+        scene.add(shellSolid);
+
+        // Lighting
+        const starLight = new THREE.PointLight(0xffddaa, 5, 2000);
+        scene.add(starLight);
+        const ambient = new THREE.AmbientLight(0x222233);
+        scene.add(ambient);
+
+        // UI Logic
+        const slider = document.getElementById('time-slider');
+        const kVal = document.getElementById('k-val');
+        const phaseVal = document.getElementById('phase-val');
+        const powerVal = document.getElementById('power-val');
+        const capVal = document.getElementById('cap-val');
+        const kBar = document.getElementById('k-bar');
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            
+            controls.update();
+            glow.lookAt(camera.position);
+
+            // Read Civilization Progress (K scale 1.1 to 2.0)
+            // Slider is 10 to 200 (representing K 1.1 to 2.0)
+            const kScale = slider.value / 100; // 0.1 to 2.0
+            
+            // Calculate logic based on K-scale
+            // K1.0 = Planet energy. K2.0 = Star energy.
+            kBar.style.width = ((kScale - 1.0) * 100) + '%';
+            
+            let phase = "";
+            let power = 0; // Exponents of 10
+            let captured = 0; // Percentage
+            
+            let swarmVisibleRatio = 0;
+            let latticeOpacity = 0;
+            let solidOpacity = 0;
+
+            if (kScale < 1.3) {
+                phase = "Initial Satellites";
+                power = 17 + (kScale - 1.1)*5; 
+                captured = 0.0001;
+                swarmVisibleRatio = (kScale - 1.1) / 0.2 * 0.2; // up to 20%
+            } else if (kScale < 1.6) {
+                phase = "Dyson Swarm";
+                power = 18 + (kScale - 1.3)*10;
+                captured = (kScale - 1.3) / 0.3 * 10; // up to 10%
+                swarmVisibleRatio = 0.2 + (kScale - 1.3) / 0.3 * 0.8; // up to 100%
+            } else if (kScale < 1.9) {
+                phase = "Dyson Bubble / Lattice";
+                power = 21 + (kScale - 1.6)*10;
+                captured = 10 + (kScale - 1.6) / 0.3 * 40; // up to 50%
+                swarmVisibleRatio = 1.0;
+                latticeOpacity = (kScale - 1.6) / 0.3; // fade in lattice
+            } else {
+                phase = "Complete Dyson Sphere";
+                power = 24 + (kScale - 1.9)*20; // Reaches ~10^26 W at K=2.0
+                captured = 50 + (kScale - 1.9) / 0.1 * 50; // up to 100%
+                swarmVisibleRatio = 1.0;
+                latticeOpacity = 1.0;
+                solidOpacity = (kScale - 1.9) / 0.1 * 0.95; // Almost fully solid
+            }
+
+            if (kScale >= 2.0) {
+                power = 26;
+                captured = 100;
+            }
+
+            // Update UI
+            kVal.textContent = kScale.toFixed(2) + (kScale >= 2.0 ? " (Stellar)" : "");
+            phaseVal.textContent = phase;
+            powerVal.textContent = `3.8 × 10^${Math.floor(power)} Watts`;
+            capVal.textContent = captured.toFixed(4) + "%";
+
+            // If fully encapsulated, the star is dim from the outside
+            const starDimming = 1.0 - (captured / 100) * 0.9; // Never fully 0 so it looks cool
+            sunMat.color.setHSL(0.15, 0.5, 0.5 * starDimming);
+            glowMat.opacity = 0.6 * starDimming;
+
+            // Update Shell
+            wireMat.opacity = latticeOpacity * 0.8;
+            panelMat.opacity = solidOpacity;
+            
+            // Slowly rotate shell
+            shellWire.rotation.y = time * 0.05;
+            shellWire.rotation.x = time * 0.02;
+            shellSolid.rotation.y = time * 0.05;
+            shellSolid.rotation.x = time * 0.02;
+
+            // Update Swarm (InstancedMesh)
+            const visibleCount = Math.floor(swarmCount * swarmVisibleRatio);
+            
+            // We only need to update matrices if they are moving, but instanced mesh is fast
+            // To save performance, we just rotate the whole group, and maybe add some individual jitter
+            swarm.rotation.y = time * 0.1;
+            swarm.rotation.z = time * 0.05;
+
+            // For visibility, we scale down the invisible ones
+            for(let i=0; i<swarmCount; i++) {
+                if (i < visibleCount) {
+                    // It's visible, give it normal scale
+                    // Color shifts to glowing yellow if it's near the shell phase
+                    if (latticeOpacity > 0.1) {
+                        swarm.setColorAt(i, new THREE.Color(0xffcc00));
+                    } else {
+                        swarm.setColorAt(i, new THREE.Color(0x8888aa));
+                    }
+                } else {
+                    swarm.setColorAt(i, new THREE.Color(0x000000)); // Hide
+                }
+            }
+            swarm.instanceColor.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

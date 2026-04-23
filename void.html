@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theoretical Void | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-page">
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li><a href="multiverse.html">Multiverse</a></li>
+                <li><a href="observations.html">Observations</a></li>
+                <li><a href="lightspeed.html">Light Speed</a></li>
+                <li><a href="explore.html" class="btn-primary">Join Research</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="hero" class="subpage-hero">
+        <div class="hero-content">
+            <h1 class="reveal-text">Theoretical Void</h1>
+            <p class="subtitle reveal-text-delay">The substrate of non-existence.</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container narrow">
+                <div class="text-block reveal">
+                    <span class="tag">Theoretical Physics</span>
+                    <h2>What is the Void?</h2>
+                    <p>The "Void" is our term for the space between branes. It is not empty space; it is the absence of space-time itself. In this region, physical laws as we know them do not exist.</p>
+                    
+                    <div class="void-quote glass">
+                        "The Void is the canvas upon which the universe is painted. To understand the paint, we must first understand the canvas."
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section bg-alt">
+            <div class="container">
+                <div class="split-content reverse">
+                    <div class="split-text reveal">
+                        <h2>Dark Flow Vectors</h2>
+                        <p>We have observed galaxies being pulled toward a specific point in the void, outside the observable universe. This "Dark Flow" suggests the existence of a massive attractor in the Beyond.</p>
+                        <ul class="benefit-list">
+                            <li>Acceleration: 600 km/s</li>
+                            <li>Direction: Centaurus/Hydra</li>
+                            <li>Cause: Extra-universal gravity</li>
+                        </ul>
+                    </div>
+                    <div class="split-visual reveal">
+                        <div class="void-visualization">
+                            <div class="void-circle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 Beyond Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .dark-page { background: #050505; color: #fff; }
+        .void-quote {
+            padding: 3rem;
+            margin-top: 3rem;
+            border-left: 4px solid var(--accent);
+            font-style: italic;
+            font-size: 1.4rem;
+        }
+        .void-circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            box-shadow: 0 0 50px rgba(94, 92, 230, 0.1);
+        }
+        .void-circle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 5px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--accent);
+        }
+    </style>
+
+    <script src="script.js"></script>
+</body>
+</html>

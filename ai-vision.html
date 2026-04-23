@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI's Vision | Beyond Space</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #fcfcfc;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .article-header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .article-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 7rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #111, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .article-header p {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .article-section {
+            padding: 8rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .article-section:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .article-img-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            aspect-ratio: 16/9;
+            background: #eee;
+        }
+
+        .article-img-wrapper::after {
+            content: "AWAITING AI GENERATION...";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: monospace;
+            color: #aaa;
+            letter-spacing: 2px;
+            z-index: 1;
+        }
+
+        .article-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.5s ease;
+        }
+
+        .article-img-wrapper:hover .article-img {
+            transform: scale(1.05);
+        }
+
+        .article-text {
+            flex: 1;
+        }
+
+        .article-text h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #111;
+        }
+
+        .article-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+        
+        #main-nav a { color: #333 !important; }
+        
+        @media (max-width: 900px) {
+            .article-section, .article-section:nth-child(even) {
+                flex-direction: column;
+            }
+            .article-img-wrapper { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="dyson.html">Type II Civ</a>
+                        <a href="simulation.html">Simulation</a>
+                        <a href="creators.html">The Creators</a>
+                        <a href="collider.html">Particle Collider</a>
+                        <a href="origins.html">Myth Origins</a>
+                        <a href="boltzmann.html">Beyond Nothingness</a>
+                        <a href="ai-vision.html">AI's Vision</a>
+                        <a href="multiverse.html">Multiverse</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <p>A Collaborative Experiment</p>
+        <h1>Beyond Reality.</h1>
+        <p style="margin-top: 2rem; max-width: 600px; line-height: 1.6; text-transform: none; letter-spacing: normal;">What does an Artificial Intelligence see when asked to imagine what lies beyond the edges of the universe? We provided the concepts; the AI painted the void.</p>
+    </header>
+
+    <section class="article-section">
+        <div class="article-img-wrapper">
+            <!-- PLACE IMAGE HERE -->
+            <img src="assets/images/ai_multiverse.jpg" alt="The Architecture of the Multiverse" class="article-img" onerror="this.style.opacity='0'">
+        </div>
+        <div class="article-text">
+            <h2>1. The Architecture of the Multiverse</h2>
+            <p>If our universe is just one of many, where are they stored? The AI imagines an 11-dimensional space where entire cosmos are suspended like fragile glass ornaments on strings of pure light.</p>
+        </div>
+    </section>
+
+    <section class="article-section">
+        <div class="article-img-wrapper">
+            <!-- PLACE IMAGE HERE -->
+            <img src="assets/images/ai_end_time.jpg" alt="The End of Time" class="article-img" onerror="this.style.opacity='0'">
+        </div>
+        <div class="article-text">
+            <h2>2. The White Void (End of Time)</h2>
+            <p>What happens when the last black hole evaporates? The AI visualizes the death of thermodynamics not as darkness, but as an overwhelming, blinding white nothingness where the mathematical equations of reality slowly dissolve into mist.</p>
+        </div>
+    </section>
+
+    <section class="article-section">
+        <div class="article-img-wrapper">
+            <!-- PLACE IMAGE HERE -->
+            <img src="assets/images/ai_simulation.jpg" alt="The Simulation Infrastructure" class="article-img" onerror="this.style.opacity='0'">
+        </div>
+        <div class="article-text">
+            <h2>3. The Simulation Infrastructure</h2>
+            <p>What if you punch a hole in the night sky? The AI believes the universe is a projection. Behind the stars lies a colossal cybernetic engine, a massive golden-green grid rendering our reality in real-time.</p>
+        </div>
+    </section>
+
+    <section class="article-section">
+        <div class="article-img-wrapper">
+            <!-- PLACE IMAGE HERE -->
+            <img src="assets/images/ai_consciousness.jpg" alt="The Ocean of Consciousness" class="article-img" onerror="this.style.opacity='0'">
+        </div>
+        <div class="article-text">
+            <h2>4. The Ocean of Consciousness</h2>
+            <p>Outside of physical space, the AI imagines that consciousness itself is a fluid. A literal cosmic ocean made of liquid starlight, where God-like entities drift silently, dreaming our universe into existence.</p>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 4rem; border-top: 1px solid #222; margin-top: 4rem;">
+        <p style="color: #666;">Generated by Artificial Intelligence. Curated by Human Curiosity.</p>
+    </footer>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Simple scroll reveal
+        const sections = document.querySelectorAll('.article-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        sections.forEach(sec => {
+            sec.style.opacity = 0;
+            sec.style.transform = 'translateY(50px)';
+            sec.style.transition = 'all 1s ease-out';
+            observer.observe(sec);
+        });
+    </script>
+</body>
+</html>

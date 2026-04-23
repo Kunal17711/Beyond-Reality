@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon Physics | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li><a href="multiverse.html">Multiverse</a></li>
+                <li><a href="observations.html">Observations</a></li>
+                <li><a href="lightspeed.html">Light Speed</a></li>
+                <li><a href="explore.html" class="btn-primary">Join Research</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="hero" class="subpage-hero">
+        <div class="hero-content">
+            <h1 class="reveal-text">Horizon Physics</h1>
+            <p class="subtitle reveal-text-delay">The laws of the edge.</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <div class="section-header center">
+                    <span class="tag">Quantum Mechanics</span>
+                    <h2>Rewriting the Constants</h2>
+                    <p>At the edge of the observable universe, the fundamental constants of physics begin to fluctuate. Our research focuses on mapping these variances.</p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="p-card reveal">
+                        <h3>Brane Tension</h3>
+                        <p>The energy density of our 3D universe membrane. Fluctuations in tension suggest interactions with neighboring branes.</p>
+                    </div>
+                    <div class="p-card reveal">
+                        <h3>Entropy Leakage</h3>
+                        <p>Evidence that information is not lost in black holes, but is instead "siphoned" into the Beyond.</p>
+                    </div>
+                    <div class="p-card reveal">
+                        <h3>Vacuum Decay</h3>
+                        <p>The theoretical risk of our universe shifting into a lower energy state due to external pressure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section bg-alt">
+            <div class="container narrow">
+                <div class="math-block glass reveal">
+                    <div class="formula">Ω_beyond = ∫ [ G(μ,ν) + Λg_μν ] dV_void</div>
+                    <p class="formula-desc">The Beyond-Gravity Equation: A theoretical model for calculating the pull from extra-universal mass.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 Beyond Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .physics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        .p-card {
+            padding: 2.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+        }
+        .math-block {
+            padding: 4rem;
+            text-align: center;
+            border-radius: 30px;
+        }
+        .formula {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+        }
+        .formula-desc {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+    </style>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Speed Simulator | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #ff3366;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); }
+        .data-value { color: #fff; font-weight: 600; font-size: 1rem;}
+        .data-value.highlight { color: #ff3366; font-size: 1.2rem; }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+        .control-group label {
+            display: block;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ff3366;
+        }
+
+        #controls-info { 
+            position: absolute; 
+            bottom: 40px; 
+            right: 40px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+        
+        #warning-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff3366;
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 5px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            text-shadow: 0 0 20px #ff3366;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="time.html">Time Relativity</a>
+                        <a href="multiverse.html">Multiverse</a>
+                        <a href="observations.html">Observations</a>
+                        <a href="lightspeed.html">Light Speed</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: #ff3366; color: #fff; border: none; font-weight: 600;">Aberration Engine</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Light Speed</h1>
+        
+        <div class="data-panel">
+            <h2>Relativistic Flight</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">Experience true optical effects of moving near the speed of light.</p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">VELOCITY (v/c)</span>
+                    <span id="vel-val" class="data-value highlight">0.00 c</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">LORENTZ FACTOR (γ)</span>
+                    <span id="gamma-val" class="data-value">1.000</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">DOPPLER SHIFT</span>
+                    <span id="doppler-val" class="data-value">None</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">FIELD OF VIEW</span>
+                    <span id="fov-val" class="data-value">Normal</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>THROTTLE (% OF c)</label>
+                <input type="range" id="velocity-slider" min="0" max="99" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>cos(θ') = (cos(θ) - β) / (1 - β cos(θ))</div>
+        <div>f' = f * √((1+β)/(1-β))</div>
+        <div style="margin-top: 10px; color: #ff3366;">RELATIVISTIC ABERRATION: ACTIVE</div>
+    </div>
+
+    <div id="controls-info">
+        DRAG MOUSE TO LOOK AROUND<br>
+        PUSH THROTTLE TO ENGAGE LORENTZ TRANSFORM
+    </div>
+    
+    <div id="warning-overlay">CMB RADIATION SHIFT<br><span style="font-size: 1rem; color:#fff;">MICROWAVE BACKGROUND BECOMING VISIBLE</span></div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // For camera look
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
+        camera.position.set(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Relativistic Starfield Shader
+        // This calculates both Aberration (stars clumping forward) and Doppler Shift (color changes)
+        const starVertexShader = `
+            uniform float beta; // v/c
+            uniform float gamma; // Lorentz factor
+            
+            varying vec3 vColor;
+            varying float vIntensity;
+
+            // Approximate color matching for frequency to RGB
+            vec3 spectralColor(float freq) {
+                // Baseline: 1.0 is white/yellow star. 
+                // > 1 is blue/ultraviolet. < 1 is red/infrared.
+                if(freq < 0.2) return vec3(0.0); // Infrared (invisible)
+                if(freq < 0.5) return mix(vec3(0.2, 0.0, 0.0), vec3(1.0, 0.0, 0.0), (freq-0.2)/0.3); // Deep red
+                if(freq < 0.8) return mix(vec3(1.0, 0.0, 0.0), vec3(1.0, 0.8, 0.5), (freq-0.5)/0.3); // Red to Yellow
+                if(freq < 1.5) return mix(vec3(1.0, 0.8, 0.5), vec3(0.8, 0.9, 1.0), (freq-0.8)/0.7); // Yellow to White
+                if(freq < 3.0) return mix(vec3(0.8, 0.9, 1.0), vec3(0.3, 0.4, 1.0), (freq-1.5)/1.5); // White to Blue
+                if(freq < 5.0) return mix(vec3(0.3, 0.4, 1.0), vec3(0.1, 0.0, 0.5), (freq-3.0)/2.0); // Blue to Violet
+                return vec3(0.05, 0.0, 0.1); // Ultraviolet (mostly dark, slight violet glow)
+            }
+
+            void main() {
+                // Assume camera looks down -Z. Travel direction is -Z.
+                vec3 pos = position;
+                
+                // Distance to star
+                float r = length(pos);
+                vec3 dir = pos / r;
+                
+                // Angle with respect to travel direction (-Z)
+                float cosTheta = -dir.z; 
+                
+                // 1. RELATIVISTIC ABERRATION (Geometry transformation)
+                // Stars bunch up in the direction of motion
+                float cosThetaPrime = (cosTheta - beta) / (1.0 - beta * cosTheta);
+                
+                // Calculate new direction vector
+                float sinThetaPrime = sqrt(max(0.0, 1.0 - cosThetaPrime * cosThetaPrime));
+                
+                // Original azimuthal angle remains unchanged
+                float phi = atan(dir.y, dir.x);
+                
+                vec3 newDir = vec3(
+                    sinThetaPrime * cos(phi),
+                    sinThetaPrime * sin(phi),
+                    -cosThetaPrime // back to -Z being forward
+                );
+                
+                // 2. RELATIVISTIC DOPPLER EFFECT (Color shift)
+                // f' / f = sqrt((1+beta)/(1-beta)) for straight ahead
+                // General form: f' / f = 1 / (gamma * (1 - beta * cosTheta))
+                float dopplerShift = 1.0 / (gamma * (1.0 - beta * cosTheta));
+                
+                // Base frequency (1.0 = normal visible light)
+                // We add some random base frequency to stars for variety
+                float baseFreq = 0.8 + 0.4 * fract(sin(dot(pos.xy, vec2(12.9898,78.233))) * 43758.5453);
+                float newFreq = baseFreq * dopplerShift;
+                
+                vColor = spectralColor(newFreq);
+                
+                // Intensity also increases forward (Searchlight effect)
+                // I' = I * (dopplerShift ^ 4)  (simplified roughly to ^2 for visual purposes so it's not totally blinding)
+                vIntensity = pow(dopplerShift, 1.5);
+                
+                // If the star is completely redshifted out, intensity is 0
+                if(newFreq < 0.2 || newFreq > 6.0) vIntensity *= 0.1; 
+
+                // Projected position
+                vec4 mvPosition = modelViewMatrix * vec4(newDir * r, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
+                
+                // Size depends on intensity and distance
+                gl_PointSize = max(1.0, min(10.0, (150.0 / -mvPosition.z) * vIntensity));
+            }
+        `;
+
+        const starFragmentShader = `
+            varying vec3 vColor;
+            varying float vIntensity;
+
+            void main() {
+                // Soft circle
+                vec2 pt = gl_PointCoord - vec2(0.5);
+                float rSq = dot(pt, pt);
+                if (rSq > 0.25) discard;
+                
+                float alpha = (0.25 - rSq) * 4.0;
+                
+                gl_FragColor = vec4(vColor * vIntensity, alpha * min(1.0, vIntensity));
+            }
+        `;
+
+        const uniforms = {
+            beta: { value: 0.0 },
+            gamma: { value: 1.0 }
+        };
+
+        const starMaterial = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: starVertexShader,
+            fragmentShader: starFragmentShader,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        // Create 20,000 stars far away
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 20000;
+        const starPos = new Float32Array(starCount * 3);
+        
+        for(let i=0; i<starCount; i++) {
+            // Distribute randomly on a large sphere
+            const u = Math.random();
+            const v = Math.random();
+            const theta = u * 2.0 * Math.PI;
+            const phi = Math.acos(2.0 * v - 1.0);
+            const r = 500 + Math.random() * 1500;
+            
+            starPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+            starPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+            starPos[i*3+2] = r * Math.cos(phi);
+        }
+        
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const stars = new THREE.Points(starGeo, starMaterial);
+        scene.add(stars);
+
+        // UI Logic
+        const slider = document.getElementById('velocity-slider');
+        const velVal = document.getElementById('vel-val');
+        const gammaVal = document.getElementById('gamma-val');
+        const dopplerVal = document.getElementById('doppler-val');
+        const fovVal = document.getElementById('fov-val');
+        const warning = document.getElementById('warning-overlay');
+
+        // Animation Loop
+        let targetLookX = 0;
+        let targetLookY = 0;
+        let currentLookX = 0;
+        let currentLookY = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Camera smoothing
+            currentLookX += (mouseX - currentLookX) * 0.05;
+            currentLookY += (mouseY - currentLookY) * 0.05;
+            
+            camera.rotation.x = -currentLookY * 0.5;
+            camera.rotation.y = -currentLookX * 0.5;
+
+            // Physics calculation
+            // Slider goes 0 to 99. Maps to 0 to 0.999 c non-linearly to allow fine tuning near c
+            const rawVal = slider.value / 100; // 0 to 0.99
+            let beta = 0;
+            if (rawVal < 0.5) {
+                beta = rawVal * 1.5; // up to 0.75c
+            } else {
+                // Approach 0.999 exponentially
+                beta = 0.75 + (0.249 * ((rawVal - 0.5) / 0.5));
+            }
+
+            const gamma = 1 / Math.sqrt(1 - beta*beta);
+
+            // Update shader
+            uniforms.beta.value = beta;
+            uniforms.gamma.value = gamma;
+
+            // UI Update
+            velVal.textContent = beta.toFixed(3) + " c";
+            gammaVal.textContent = gamma.toFixed(3);
+            
+            if (beta === 0) {
+                dopplerVal.textContent = "None";
+                dopplerVal.style.color = "#fff";
+                fovVal.textContent = "Normal (180° visible)";
+                warning.style.opacity = 0;
+            } else if (beta < 0.5) {
+                dopplerVal.textContent = "Slight Blueshift";
+                dopplerVal.style.color = "#88aaff";
+                fovVal.textContent = "Contracting Forward";
+                warning.style.opacity = 0;
+            } else if (beta < 0.9) {
+                dopplerVal.textContent = "Heavy UV Shift";
+                dopplerVal.style.color = "#5533ff";
+                fovVal.textContent = "Stars Clustering";
+                warning.style.opacity = 0;
+            } else {
+                dopplerVal.textContent = "EXTREME X-RAY SHIFT";
+                dopplerVal.style.color = "#ff33ff";
+                fovVal.textContent = "Tunnel Vision";
+                if (beta > 0.98) {
+                    warning.style.opacity = 1;
+                } else {
+                    warning.style.opacity = 0;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

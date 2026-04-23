@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Butterfly Dream | Paradoxes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #fdfbf7;
+            color: #333;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero {
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .hero-tag {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #8a733f;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(3rem, 7vw, 6rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+
+        .article-body {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .main-image-container {
+            width: 100%;
+            position: relative;
+            aspect-ratio: 16/9;
+            margin: -5rem auto 5rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            background: #eee;
+        }
+
+        .main-image-container::after {
+            content: "AWAITING AI GENERATION...";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: monospace;
+            color: #888;
+            letter-spacing: 2px;
+            z-index: 1;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+        }
+
+        .quote-block {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-style: italic;
+            color: #8a733f;
+            text-align: center;
+            margin: 4rem 0;
+            line-height: 1.6;
+            padding: 0 2rem;
+            border-left: 2px solid #8a733f;
+            border-right: 2px solid #8a733f;
+        }
+
+        .article-text {
+            font-size: 1.15rem;
+            line-height: 2;
+            color: #444;
+            margin-bottom: 2rem;
+        }
+
+        .article-text strong {
+            color: #111;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            color: #111;
+            margin: 4rem 0 2rem;
+            text-align: center;
+        }
+
+        .conclusion {
+            margin-top: 5rem;
+            padding: 3rem;
+            background: rgba(138, 115, 63, 0.05);
+            border: 1px solid rgba(138, 115, 63, 0.2);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .conclusion p {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: #111;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #111 !important; }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Paradoxes</a>
+                    <div class="dropdown-content">
+                        <a href="paradox-butterfly.html">The Butterfly Dream</a>
+                        <!-- Future paradoxes will go here -->
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Simulators</a>
+                    <div class="dropdown-content" style="max-height: 60vh; overflow-y: auto;">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="dyson.html">Type II Civ</a>
+                        <a href="simulation.html">Simulation Hypothesis</a>
+                        <a href="creators.html">The Creators</a>
+                        <a href="collider.html">Particle Collider</a>
+                        <a href="boltzmann.html">Beyond Nothingness</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-tag">Daily Paradox • Issue #01</div>
+        <h1>Zhuangzi's Butterfly</h1>
+        <p style="font-family: 'Playfair Display'; font-style: italic; font-size: 1.3rem; color: #888; margin-top: 1rem;">Are you the dreamer, or the dream?</p>
+    </header>
+
+    <div class="article-body">
+        
+        <div class="main-image-container">
+            <!-- PLACE IMAGE HERE -->
+            <img src="assets/images/paradox_butterfly.jpg" alt="Zhuangzi's Butterfly Dream" class="main-image" onerror="this.style.opacity='0'">
+        </div>
+
+        <div class="quote-block">
+            "Once upon a time, I dreamt I was a butterfly, fluttering hither and thither, to all intents and purposes a butterfly... Suddenly I awoke, and there I was, veritably myself again. Now I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly, dreaming I am a man."
+            <br><span style="font-size: 1rem; color: #888; font-family: 'Inter', sans-serif; display: block; margin-top: 1rem;">— Zhuangzi (c. 369 BC – c. 286 BC)</span>
+        </div>
+
+        <p class="article-text">
+            Written over two thousand years ago by the ancient Chinese philosopher Zhuangzi, this short passage remains one of the most profound inquiries into human consciousness and the nature of reality. It challenges the very foundation of epistemological certainty: <strong>How do we know that what we are experiencing right now is real?</strong>
+        </p>
+
+        <p class="article-text">
+            When you dream, the world inside your mind feels as solid, complex, and undeniable as the waking world. You feel the wind, you experience fear and joy, and the laws of physics seem to apply. It is only upon waking that the illusion shatters. But Zhuangzi flips this universal experience on its head—what if the "waking" state is merely a transition into another, more persistent dream?
+        </p>
+
+        <h2 class="section-title">The Illusion of Form</h2>
+        
+        <p class="article-text">
+            This paradox cuts deeper than mere solipsism. It introduces the concept of the <strong>Transformation of Things (Wù Huà)</strong>. Zhuangzi argues that the boundary between the self and the other, between the human and the butterfly, is a cognitive illusion. We divide the universe into distinct forms because our brains are wired for survival, not for perceiving absolute truth. 
+        </p>
+
+        <p class="article-text">
+            If consciousness can seamlessly inhabit the form of a butterfly in a dream, completely abandoning the memory and identity of the man, then identity itself is fluid. "Zhuangzi" and "Butterfly" are just temporary states of a deeper, undivided universal consciousness.
+        </p>
+
+        <h2 class="section-title">The Quantum Connection</h2>
+
+        <p class="article-text">
+            Remarkably, Zhuangzi's paradox mirrors modern theoretical physics, specifically the <strong>Simulation Hypothesis</strong> and <strong>Quantum Superposition</strong>. If reality is rendered by an advanced quantum computer, then our physical bodies are no more "real" than the avatar of a butterfly rendered in a digital dream state. 
+        </p>
+
+        <p class="article-text">
+            In quantum mechanics, particles do not have a definite state until they are observed. They exist in a haze of probabilities. Could "waking up" merely be the act of consciousness collapsing the universal wavefunction into a specific human form? Are we, right now, just the universe dreaming about being human?
+        </p>
+
+        <div class="conclusion">
+            <p>
+                Perhaps there is no absolute "reality" to wake up to. Whether a man dreaming of a butterfly, or a butterfly dreaming of a man, both are expressions of the same infinite void experiencing itself. The paradox is not a problem to be solved, but a liberation from the illusion of a rigid self.
+            </p>
+        </div>
+
+    </div>
+
+    <footer style="text-align: center; padding: 4rem; border-top: 1px solid #222; margin-top: 2rem;">
+        <p style="color: #666; font-family: 'Outfit';">Beyond Reality • Daily Paradox Series</p>
+    </footer>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+    </script>
+</body>
+</html>

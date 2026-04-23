@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Foam | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(25px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            width: 440px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #00ffff;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); }
+        .data-value { color: #fff; font-weight: 600; font-size: 0.95rem;}
+        .data-value.highlight { color: #00ffff; font-size: 1.2rem; }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+        }
+        .control-group label {
+            display: block;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00ffff;
+        }
+
+        #controls-info { 
+            position: absolute; 
+            bottom: 40px; 
+            right: 40px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.75rem; 
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="time.html">Time Relativity</a>
+                        <a href="multiverse.html">Multiverse</a>
+                        <a href="lightspeed.html">Light Speed</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: #00ffff; color: #000; border: none; font-weight: 600;">Sub-Planck Topology</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Quantum Foam</h1>
+        
+        <div class="data-panel">
+            <h2>The Fabric of Reality</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">At 10⁻³⁵ meters, space and time cease to be smooth. They become a violent, boiling foam of quantum fluctuations, micro-wormholes, and higher dimensions.</p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">SCALE OF OBSERVATION</span>
+                    <span class="data-value highlight">1.616 × 10⁻³⁵ m</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">TOPOLOGICAL ENERGY</span>
+                    <span id="energy-val" class="data-value">FLUCTUATING</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">VIRTUAL PARTICLES</span>
+                    <span class="data-value" style="color:#ff3366;">SPAWNING/ANNIHILATING</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">DIMENSIONALITY</span>
+                    <span class="data-value">11D (M-Theory)</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>QUANTUM TURBULENCE (ΔEΔt ≥ ℏ/2)</label>
+                <input type="range" id="turb-slider" min="0" max="100" value="30">
+            </div>
+            <div class="control-group">
+                <label>DIMENSIONAL FOLDING</label>
+                <input type="range" id="fold-slider" min="0" max="100" value="50">
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>ℓP = √(ℏG/c³)</div>
+        <div>ΔE Δt ≥ ℏ/2 (HEISENBERG UNCERTAINTY)</div>
+        <div style="margin-top: 10px; color: #00ffff;">SPACETIME IS NOT FUNDAMENTAL</div>
+    </div>
+
+    <div id="controls-info">
+        MOVE MOUSE TO SHIFT OBSERVATION ANGLE<br>
+        BEYOND HUMAN IMAGINATION
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            mouseX = (e.clientX / window.innerWidth) * 2.0 - 1.0;
+            mouseY = -(e.clientY / window.innerHeight) * 2.0 + 1.0;
+        });
+
+        // Setup Scene using a Fullscreen Quad for heavy Raymarching
+        const container = document.getElementById('canvas-container');
+        const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        // Cap pixel ratio to 1 for performance on this incredibly heavy shader
+        renderer.setPixelRatio(1.0); 
+        container.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+        camera.position.z = 1;
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+
+        // --- THE QUANTUM FOAM RAYMARCHING SHADER ---
+        // This calculates a complex 3D fractal (Mandelbox variant) to represent 
+        // the chaotic, folding nature of spacetime at the Planck scale.
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform float time;
+            uniform vec2 resolution;
+            uniform vec2 mouse;
+            uniform float turbulence;
+            uniform float folding;
+
+            #define MAX_STEPS 80
+            #define MAX_DIST 10.0
+            #define SURF_DIST 0.005
+
+            // Rotation matrix
+            mat2 rot(float a) {
+                float s = sin(a), c = cos(a);
+                return mat2(c, -s, s, c);
+            }
+
+            // 3D Fractal Distance Estimator (Modified Mandelbox/Kali-set)
+            // Represents the folding of 11-dimensional space into microscopic geometry
+            float map(vec3 p) {
+                vec3 z = p;
+                float dr = 1.0;
+                
+                // Add quantum fluctuation (turbulence)
+                float t = time * turbulence * 2.0;
+                
+                // Fold space
+                for (int i = 0; i < 6; i++) {
+                    // Twist and rotate dimensions
+                    z.xy *= rot(t * 0.1 + float(i)*0.1);
+                    z.xz *= rot(mouse.x * 0.5);
+                    z.yz *= rot(mouse.y * 0.5);
+                    
+                    // Box fold
+                    z = clamp(z, -1.0, 1.0) * 2.0 - z;
+                    
+                    // Sphere fold (inversion)
+                    float r2 = dot(z, z);
+                    float k = max((folding * 2.0) / r2, 0.1);
+                    z *= k;
+                    dr *= k;
+                    
+                    // Scale and shift
+                    z = z * 2.5 - p;
+                    dr = dr * 2.5 + 1.0;
+                }
+                
+                return length(z) / abs(dr);
+            }
+
+            // Raymarching loop
+            vec4 raymarch(vec3 ro, vec3 rd) {
+                float dO = 0.0;
+                float minStep = 0.001;
+                float glow = 0.0;
+                vec3 p;
+                
+                for(int i=0; i<MAX_STEPS; i++) {
+                    p = ro + rd * dO;
+                    float dS = map(p);
+                    
+                    // Accumulate glow based on how close we get to the fractal surfaces
+                    // This creates the "virtual particle / quantum energy" effect
+                    glow += 0.01 / (0.01 + dS * dS * 100.0);
+                    
+                    dO += max(dS, minStep); // Prevent getting stuck
+                    if(dO > MAX_DIST || dS < SURF_DIST) break;
+                }
+                
+                return vec4(dO, glow, p.x, p.y);
+            }
+
+            // Calculate normals
+            vec3 getNormal(vec3 p) {
+                float d = map(p);
+                vec2 e = vec2(0.001, 0);
+                vec3 n = d - vec3(
+                    map(p - e.xyy),
+                    map(p - e.yxy),
+                    map(p - e.yyx)
+                );
+                return normalize(n);
+            }
+
+            void main() {
+                vec2 uv = (gl_FragCoord.xy - 0.5 * resolution.xy) / resolution.y;
+                
+                // Camera setup
+                vec3 ro = vec3(0.0, 0.0, -3.0); // Origin
+                vec3 rd = normalize(vec3(uv, 1.0)); // Ray direction
+                
+                // Add slight chaotic jitter to ray (Heisenberg Uncertainty Principle visual)
+                rd.xy += vec2(fract(sin(dot(uv.xy + time, vec2(12.9898,78.233))) * 43758.5453) - 0.5) * 0.005 * turbulence;
+
+                // March!
+                vec4 rm = raymarch(ro, rd);
+                float d = rm.x;
+                float glow = rm.y;
+                
+                vec3 col = vec3(0.0);
+                
+                if(d < MAX_DIST) {
+                    vec3 p = ro + rd * d;
+                    vec3 n = getNormal(p);
+                    
+                    // Lighting
+                    vec3 lightDir = normalize(vec3(sin(time), 1.0, cos(time)));
+                    float diff = max(dot(n, lightDir), 0.0);
+                    
+                    // Shading based on normal and position (alien topological colors)
+                    vec3 baseColor = 0.5 + 0.5 * cos(vec3(0,2,4) + p.z * 2.0 + time);
+                    col = baseColor * diff * 0.5;
+                    
+                    // Add rim light / electron shell glow
+                    float rim = 1.0 - max(dot(n, -rd), 0.0);
+                    col += vec3(0.0, 1.0, 1.0) * pow(rim, 3.0) * 0.5;
+                }
+                
+                // Add the volumetric Quantum Glow
+                vec3 glowColor = mix(vec3(0.8, 0.0, 1.0), vec3(0.0, 1.0, 1.0), sin(time*0.5)*0.5+0.5);
+                col += glowColor * glow * 0.3 * (0.5 + turbulence * 0.5);
+                
+                // Vignette
+                col *= 1.0 - length(uv) * 0.5;
+
+                gl_FragColor = vec4(col, 1.0);
+            }
+        `;
+
+        const uniforms = {
+            time: { value: 0.0 },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            mouse: { value: new THREE.Vector2(0, 0) },
+            turbulence: { value: 0.3 },
+            folding: { value: 0.5 }
+        };
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: uniforms
+        });
+
+        const quad = new THREE.Mesh(geometry, material);
+        scene.add(quad);
+
+        // UI Logic
+        const turbSlider = document.getElementById('turb-slider');
+        const foldSlider = document.getElementById('fold-slider');
+        const energyVal = document.getElementById('energy-val');
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            uniforms.time.value += delta;
+            
+            // Smooth mouse follow
+            uniforms.mouse.value.x += (mouseX - uniforms.mouse.value.x) * 0.05;
+            uniforms.mouse.value.y += (mouseY - uniforms.mouse.value.y) * 0.05;
+
+            // Update parameters
+            uniforms.turbulence.value = turbSlider.value / 100;
+            uniforms.folding.value = foldSlider.value / 100;
+
+            // Fake energy string for UI
+            const energy = Math.random() * 100 * (turbSlider.value/100 + 0.1);
+            energyVal.textContent = energy.toFixed(2) + " Eₚ (Planck Energy)";
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            renderer.setSize(w, h);
+            uniforms.resolution.value.set(w, h);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

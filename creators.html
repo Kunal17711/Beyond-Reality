@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Creators | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-top: 3px solid #ffd700;
+            margin-top: 20px;
+            width: 440px;
+            box-shadow: 0 10px 50px rgba(255,215,0,0.1), inset 0 0 20px rgba(255,255,255,0.05);
+            pointer-events: auto;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #ffd700;
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .physics-data {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,215,0,0.2);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.6); letter-spacing: 1px;}
+        .data-value { color: #fff; font-weight: 600;}
+        .data-value.highlight { color: #ffd700; font-size: 1.1rem; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,215,0,0.3);
+        }
+        .control-group label {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: #ffd700;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ffd700;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            height: 2px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #ffd700;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px #ffd700;
+        }
+
+        .state-btn {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 12px;
+            width: 100%;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .state-btn:hover {
+            background: #ffd700;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: #ffd700;
+            mix-blend-mode: normal;
+            box-shadow: 0 0 20px #ffd700;
+            z-index: 9999;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: width 0.1s, height 0.1s;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: 'Cinzel', serif;
+            color: rgba(255,215,0,0.5);
+            font-size: 0.9rem;
+            pointer-events: none;
+            line-height: 1.5;
+            letter-spacing: 2px;
+        }
+
+        .god-text {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-top: 5px;
+            background: -webkit-linear-gradient(#fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,215,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo" style="font-family:'Cinzel',serif; letter-spacing:3px;">BEYOND</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="dyson.html">Type II Civ</a>
+                        <a href="simulation.html">Simulation</a>
+                        <a href="creators.html">The Creators</a>
+                        <a href="multiverse.html">Multiverse</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: rgba(255,215,0,0.2); color: #ffd700; border: 1px solid #ffd700; font-family:'Cinzel',serif; letter-spacing:2px;">OMEGA POINT CIVILIZATION</span>
+        <h1 class="god-text">THE ARCHITECTS</h1>
+        
+        <div class="data-panel" id="main-panel">
+            <h2>Creation Engine Matrix</h2>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 15px; font-family:'Inter',sans-serif;">You are observing from the perspective of a Type V civilization. Beings of pure energy who exist outside of space and time. To them, entire universes are mere simulations running in the palm of their hands.</p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">ACTIVE UNIVERSES</span>
+                    <span class="data-value highlight">3 (Local Cluster)</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">DIMENSIONAL PLANE</span>
+                    <span class="data-value">11th Spatial Dimension</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">CONSCIOUSNESS</span>
+                    <span class="data-value" style="color:#00ffff;">Omnipresent</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">ENTROPY LEVEL</span>
+                    <span id="entropy-val" class="data-value" style="color:#ff3366;">0.00% (Controlled)</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>MANIPULATE GRAVITATIONAL CONSTANT (G)</label>
+                <input type="range" id="grav-slider" min="10" max="100" value="50">
+            </div>
+            
+            <div class="control-group">
+                <label>INJECT DARK ENERGY (EXPANSION RATE)</label>
+                <input type="range" id="exp-slider" min="0" max="100" value="20">
+            </div>
+
+            <button id="btn-bigbang" class="state-btn">INITIATE BIG BANG LOOP</button>
+        </div>
+    </div>
+
+    <div class="math-overlay" id="math-overlay">
+        <div>"LET THERE BE LIGHT."</div>
+        <div>U = ∫∫∫ ψ*(x,t) H ψ(x,t) d³x</div>
+        <div style="margin-top: 10px; color: #ffd700;">MULTIVERSE SIMULATION ONLINE</div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        // Ethereal white/gold fog background
+        scene.background = new THREE.Color(0x0a0510);
+        scene.fog = new THREE.FogExp2(0x0a0510, 0.002);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 50, 200);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // Tone mapping for bright god-rays
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // --- THE CREATOR'S ENVIRONMENT ---
+        
+        // Massive ethereal rings (Halo)
+        const haloGroup = new THREE.Group();
+        scene.add(haloGroup);
+        
+        for(let i=0; i<3; i++) {
+            const ringGeo = new THREE.TorusGeometry(150 + i*40, 0.5, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.15 - i*0.03,
+                blending: THREE.AdditiveBlending
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2 + (Math.random()-0.5)*0.2;
+            ring.rotation.y = (Math.random()-0.5)*0.2;
+            haloGroup.add(ring);
+        }
+
+        // Floating ambient light particles (Energy)
+        const pGeo = new THREE.BufferGeometry();
+        const pCount = 2000;
+        const pPos = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount; i++) {
+            pPos[i*3] = (Math.random()-0.5)*400;
+            pPos[i*3+1] = (Math.random()-0.5)*400;
+            pPos[i*3+2] = (Math.random()-0.5)*400;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 1.5,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending,
+            map: createRadialGradient() // Glow dot
+        });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+
+        function createRadialGradient() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 32, 32);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // --- THE UNIVERSES (ORBS) ---
+        // A custom shader to make spheres look like entire universes trapped in glass
+        const universeShader = {
+            uniforms: {
+                time: { value: 0 },
+                color: { value: new THREE.Color(0xffffff) },
+                expansion: { value: 1.0 },
+                gravity: { value: 1.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                uniform float expansion;
+                void main() {
+                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    vPosition = position;
+                    // Expansion slider scales the universe orb
+                    vec3 pos = position * expansion;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                uniform vec3 color;
+                uniform float gravity;
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+
+                // Simplex Noise
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+                vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+                float snoise(vec3 v) {
+                    const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+                    const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+                    vec3 i  = floor(v + dot(v, C.yyy) );
+                    vec3 x0 = v - i + dot(i, C.xxx) ;
+                    vec3 g = step(x0.yzx, x0.xyz);
+                    vec3 l = 1.0 - g;
+                    vec3 i1 = min( g.xyz, l.zxy );
+                    vec3 i2 = max( g.xyz, l.zxy );
+                    vec3 x1 = x0 - i1 + C.xxx;
+                    vec3 x2 = x0 - i2 + C.yyy;
+                    vec3 x3 = x0 - D.yyy;
+                    i = mod289(i);
+                    vec4 p = permute( permute( permute(
+                                i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+                            + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+                            + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+                    float n_ = 0.142857142857;
+                    vec3  ns = n_ * D.wyz - D.xzx;
+                    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+                    vec4 x_ = floor(j * ns.z);
+                    vec4 y_ = floor(j - 7.0 * x_ );
+                    vec4 x = x_ *ns.x + ns.yyyy;
+                    vec4 y = y_ *ns.x + ns.yyyy;
+                    vec4 h = 1.0 - abs(x) - abs(y);
+                    vec4 b0 = vec4( x.xy, y.xy );
+                    vec4 b1 = vec4( x.zw, y.zw );
+                    vec4 s0 = floor(b0)*2.0 + 1.0;
+                    vec4 s1 = floor(b1)*2.0 + 1.0;
+                    vec4 sh = -step(h, vec4(0.0));
+                    vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+                    vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+                    vec3 p0 = vec3(a0.xy,h.x);
+                    vec3 p1 = vec3(a0.zw,h.y);
+                    vec3 p2 = vec3(a1.xy,h.z);
+                    vec3 p3 = vec3(a1.zw,h.w);
+                    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+                    p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                    vec4 m = max(0.5 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                    m = m * m;
+                    return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+                }
+
+                void main() {
+                    // Internal swirling galaxies effect (swirl based on gravity uniform)
+                    vec3 uv3 = vPosition * 0.1;
+                    uv3.y += time * 0.2;
+                    float n = snoise(uv3 * gravity);
+                    float n2 = snoise(uv3 * 2.0 - time * 0.5);
+                    
+                    // Fresnel edge (glass sphere look)
+                    float intensity = pow(0.6 - dot(vNormal, vec3(0, 0, 1.0)), 2.0);
+                    
+                    // Internal core glow
+                    float core = smoothstep(0.5, 0.0, length(vUv - 0.5));
+                    
+                    vec3 finalColor = color * (n * 0.5 + 0.5) * (n2 + 1.0);
+                    finalColor += color * intensity * 2.0; // bright edges
+                    finalColor += vec3(1.0) * core * 0.8; // bright core
+                    
+                    float alpha = intensity + core * 0.5 + (n * 0.3);
+                    
+                    gl_FragColor = vec4(finalColor, min(1.0, alpha));
+                }
+            `
+        };
+
+        const universes = [];
+        const colors = [0x00ffff, 0xff00ff, 0xffaa00]; // Cyan, Magenta, Gold
+        const uniGeo = new THREE.SphereGeometry(25, 64, 64);
+        
+        for(let i=0; i<3; i++) {
+            const mat = new THREE.ShaderMaterial({
+                uniforms: THREE.UniformsUtils.clone(universeShader.uniforms),
+                vertexShader: universeShader.vertexShader,
+                fragmentShader: universeShader.fragmentShader,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                side: THREE.FrontSide,
+                depthWrite: false
+            });
+            mat.uniforms.color.value.setHex(colors[i]);
+            
+            const mesh = new THREE.Mesh(uniGeo, mat);
+            // Position them in a triangle
+            const angle = (i / 3) * Math.PI * 2;
+            const r = 50;
+            mesh.position.set(Math.cos(angle)*r, 0, Math.sin(angle)*r);
+            
+            scene.add(mesh);
+            universes.push(mesh);
+        }
+
+        // "The Hand of the Creator" - A subtle energy field holding the universes
+        const handGeo = new THREE.SphereGeometry(80, 32, 32);
+        const handMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.05,
+            blending: THREE.AdditiveBlending
+        });
+        const hand = new THREE.Mesh(handGeo, handMat);
+        scene.add(hand);
+
+        // UI Interactions
+        const gravSlider = document.getElementById('grav-slider');
+        const expSlider = document.getElementById('exp-slider');
+        const btnBigBang = document.getElementById('btn-bigbang');
+        const entropyVal = document.getElementById('entropy-val');
+
+        let bigBangActive = false;
+        let bigBangTime = 0;
+
+        btnBigBang.addEventListener('click', () => {
+            bigBangActive = true;
+            bigBangTime = 0;
+            btnBigBang.style.opacity = '0.5';
+            btnBigBang.textContent = "RESETTING REALITY...";
+            setTimeout(() => {
+                bigBangActive = false;
+                btnBigBang.style.opacity = '1';
+                btnBigBang.textContent = "INITIATE BIG BANG LOOP";
+            }, 3000);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            const delta = clock.getDelta();
+            
+            controls.update();
+
+            // Rotate halos
+            haloGroup.children.forEach((ring, i) => {
+                ring.rotation.z += 0.001 * (i+1);
+            });
+            
+            // Particles drift
+            particles.rotation.y -= 0.0005;
+            hand.rotation.y += 0.002;
+            hand.rotation.z += 0.001;
+
+            const grav = gravSlider.value / 50; // 0.2 to 2.0
+            const exp = expSlider.value / 20; // 0.0 to 5.0
+
+            let entropy = (expSlider.value * 0.5) + (gravSlider.value * 0.2);
+
+            // Update Universes
+            universes.forEach((uni, i) => {
+                // Orbit around center
+                const angle = (i / 3) * Math.PI * 2 + time * 0.2;
+                const r = 50 + Math.sin(time + i) * 5;
+                uni.position.set(Math.cos(angle)*r, Math.sin(time*2+i)*10, Math.sin(angle)*r);
+                
+                let currentExp = exp;
+                
+                // Big Bang Effect (Crush then explode)
+                if (bigBangActive) {
+                    bigBangTime += delta;
+                    if (bigBangTime < 1.0) {
+                        // Collapse
+                        currentExp = mix(exp, 0.01, bigBangTime);
+                    } else if (bigBangTime < 1.5) {
+                        // Flash and explode
+                        currentExp = mix(0.01, exp * 2.0, (bigBangTime-1.0)*2.0);
+                        uni.material.uniforms.color.value.setHex(0xffffff);
+                    } else {
+                        // Settle back
+                        currentExp = mix(exp * 2.0, exp, (bigBangTime-1.5)*0.5);
+                        uni.material.uniforms.color.value.setHex(colors[i]);
+                    }
+                    entropy = 99.99;
+                }
+
+                uni.material.uniforms.time.value = time;
+                uni.material.uniforms.gravity.value = grav;
+                // Smooth scale expansion
+                uni.material.uniforms.expansion.value += (currentExp - uni.material.uniforms.expansion.value) * 0.1;
+            });
+
+            if(bigBangActive) {
+                entropyVal.style.color = "#ffffff";
+                entropyVal.textContent = "CRITICAL MASS";
+            } else {
+                entropyVal.style.color = "#ff3366";
+                entropyVal.textContent = entropy.toFixed(2) + "% (Controlled)";
+            }
+
+            // Camera breathing
+            camera.position.y += Math.sin(time) * 0.05;
+
+            renderer.render(scene, camera);
+        }
+
+        function mix(x, y, a) {
+            return x * (1 - a) + y * a;
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

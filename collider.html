@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Collider | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        #ui-overlay { 
+            position: absolute; 
+            top: 100px; 
+            left: 40px; 
+            color: #fff; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        .data-panel {
+            background: rgba(5, 5, 10, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-top: 4px solid #00ffff;
+            margin-top: 20px;
+            width: 440px;
+            box-shadow: 0 10px 40px rgba(0,255,255,0.1);
+            pointer-events: auto;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .data-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #00ffff;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            border-top: 1px dashed rgba(0,255,255,0.3);
+            padding-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(0,255,255,0.6); }
+        .data-value { color: #fff; font-weight: 600; font-family: 'Outfit', sans-serif;}
+        .data-value.highlight { color: #ff0055; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,0,85,0.5); }
+
+        .control-group {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(0,255,255,0.3);
+        }
+        
+        .state-btn {
+            background: rgba(0,255,255,0.1);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 12px;
+            width: 100%;
+            border-radius: 4px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .state-btn:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+        }
+        .state-btn.active {
+            background: #ff0055;
+            border-color: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255,0,85,0.8);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        #custom-cursor {
+            background: transparent;
+            border: 2px solid #00ffff;
+            mix-blend-mode: normal;
+            box-shadow: 0 0 15px #00ffff;
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: width 0.1s, height 0.1s;
+        }
+
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: 'Share Tech Mono', monospace;
+            color: rgba(0,255,255,0.5);
+            font-size: 0.85rem;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+
+        .flash-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff;
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <div class="flash-overlay" id="flash"></div>
+
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">•••</a>
+                    <div class="dropdown-content">
+                        <a href="solar.html">Solar System</a>
+                        <a href="blackhole.html">Black Hole</a>
+                        <a href="wormhole.html">Wormhole</a>
+                        <a href="quantum.html">Quantum Realm</a>
+                        <a href="cosmic-web.html">Cosmic Web</a>
+                        <a href="planck.html">Planck Scale</a>
+                        <a href="dyson.html">Type II Civ</a>
+                        <a href="simulation.html">Simulation</a>
+                        <a href="creators.html">The Creators</a>
+                        <a href="collider.html">Particle Collider</a>
+                        <a href="multiverse.html">Multiverse</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: rgba(0,255,255,0.2); color: #00ffff; border: 1px solid #00ffff;">High-Energy Physics (Earth)</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px; font-family: 'Outfit';">Large Hadron Collider</h1>
+        
+        <div class="data-panel">
+            <h2>ATLAS DETECTOR</h2>
+            <p style="font-family:'Inter', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 10px;">The most complex machine ever built by humanity, located 100m underground in Geneva. It smashes protons at 99.999999% the speed of light to literally tear open the fabric of reality and recreate the Big Bang.</p>
+            
+            <div class="physics-data">
+                <div class="data-row">
+                    <span class="data-label">MAGNETIC FIELD</span>
+                    <span class="data-value" style="color:#00ffff;">8.3 Tesla (Superconducting)</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">BEAM VELOCITY</span>
+                    <span class="data-value">0.999999991 c</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">COLLISION ENERGY</span>
+                    <span id="energy-val" class="data-value highlight">0.0 TeV</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">HIGGS BOSON PROB.</span>
+                    <span id="higgs-val" class="data-value" style="color:#ffcc00;">WAITING</span>
+                </div>
+            </div>
+
+            <button id="btn-fire" class="state-btn">INITIATE COLLISION (13.6 TeV)</button>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>E² = (pc)² + (m₀c²)² (DIRAC EQUATION)</div>
+        <div>F = q(E + v × B) (LORENTZ FORCE)</div>
+        <div style="margin-top: 10px; color: #ff0055;">MATTER CREATED FROM PURE KINETIC ENERGY</div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.body.style.cursor = 'none';
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020205);
+        scene.fog = new THREE.FogExp2(0x020205, 0.005);
+        
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(40, 20, 60);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.AdditiveToneMapping;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // --- DETECTOR WIREFRAME GEOMETRY ---
+        // Massive cylindrical sci-fi chamber representing the ATLAS detector
+        const detectorGroup = new THREE.Group();
+        scene.add(detectorGroup);
+
+        // Concentric tracking layers
+        for(let i=0; i<5; i++) {
+            const r = 5 + i*5;
+            const geo = new THREE.CylinderGeometry(r, r, 60, 32, 1, true);
+            const mat = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.1 - (i*0.015),
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const cylinder = new THREE.Mesh(geo, mat);
+            cylinder.rotation.x = Math.PI / 2; // Align along Z axis
+            detectorGroup.add(cylinder);
+        }
+
+        // Inner Beam Pipe
+        const pipeGeo = new THREE.CylinderGeometry(0.5, 0.5, 200, 16, 1, true);
+        const pipeMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.2,
+            blending: THREE.AdditiveBlending
+        });
+        const pipe = new THREE.Mesh(pipeGeo, pipeMat);
+        pipe.rotation.x = Math.PI / 2;
+        scene.add(pipe);
+
+
+        // --- PARTICLE TRACKS (THE COLLISION) ---
+        const tracksGroup = new THREE.Group();
+        scene.add(tracksGroup);
+
+        let isColliding = false;
+        let collisionTime = 0;
+        const tracks = [];
+
+        function generateTracks() {
+            // Clear old tracks
+            while(tracksGroup.children.length > 0){ 
+                tracksGroup.remove(tracksGroup.children[0]); 
+            }
+            tracks.length = 0;
+
+            const numTracks = 300; // Hundreds of subatomic particles spawned
+
+            for(let i=0; i<numTracks; i++) {
+                // Determine particle properties
+                const charge = Math.random() > 0.5 ? 1 : -1;
+                const mass = Math.random() * 5; // Fake mass
+                const momentum = 1.0 + Math.random() * 10;
+                
+                // Spiral radius based on momentum and charge (Lorentz Force)
+                const radius = (momentum / 2.0) * charge;
+                
+                // Initial direction (mostly outwards from center)
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(Math.random() * 2 - 1);
+                
+                // Color based on particle type (Energy)
+                let color;
+                if(momentum > 8) color = 0xff0055; // High energy quarks (Red)
+                else if(momentum > 4) color = 0x00ffcc; // Muons (Cyan)
+                else color = 0xffaa00; // Pions/Kaons (Yellow)
+
+                // Sometimes spawn a straight, hyper-fast track (Neutral particle / Photon)
+                const isNeutral = Math.random() > 0.9;
+                
+                tracks.push({
+                    charge, momentum, radius, theta, phi, color, isNeutral,
+                    length: 0,
+                    maxLength: 20 + Math.random() * 30,
+                    points: []
+                });
+            }
+        }
+
+        // We use BufferGeometry with dynamic draw to update the lines
+        const lineGeo = new THREE.BufferGeometry();
+        const maxPoints = 50000;
+        const positions = new Float32Array(maxPoints * 3);
+        const colors = new Float32Array(maxPoints * 3);
+        lineGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        lineGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const lineMat = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending
+        });
+        const lines = new THREE.LineSegments(lineGeo, lineMat);
+        tracksGroup.add(lines);
+
+        // UI Interactions
+        const btnFire = document.getElementById('btn-fire');
+        const flash = document.getElementById('flash');
+        const energyVal = document.getElementById('energy-val');
+        const higgsVal = document.getElementById('higgs-val');
+
+        btnFire.addEventListener('click', () => {
+            if(isColliding) return;
+            
+            // 1. Warmup / Beams firing
+            btnFire.textContent = "ACCELERATING BEAMS...";
+            btnFire.classList.add('active');
+            
+            // 2. The Collision (Delay)
+            setTimeout(() => {
+                isColliding = true;
+                collisionTime = 0;
+                generateTracks();
+                
+                // Flash bang
+                flash.style.opacity = '1';
+                flash.style.transition = 'none';
+                
+                setTimeout(() => {
+                    flash.style.transition = 'opacity 2s ease-out';
+                    flash.style.opacity = '0';
+                }, 50);
+
+                energyVal.textContent = "13.6 TeV (MAXIMUM)";
+                higgsVal.textContent = "DETECTED (125 GeV)";
+                higgsVal.style.color = "#00ff00";
+
+                btnFire.textContent = "ANALYZING DATA...";
+                
+                setTimeout(() => {
+                    btnFire.textContent = "INITIATE COLLISION (13.6 TeV)";
+                    btnFire.classList.remove('active');
+                    isColliding = false;
+                }, 4000);
+                
+            }, 1000);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            const delta = clock.getDelta();
+            
+            controls.update();
+
+            // Rotate detector slowly
+            detectorGroup.rotation.z = time * 0.1;
+
+            if (isColliding) {
+                collisionTime += delta * 2.0; // Speed of propagation
+                
+                let ptIndex = 0;
+                
+                tracks.forEach(track => {
+                    // Calculate current position based on time
+                    // They move outwards and spiral along Z axis (B-field is along Z)
+                    if (track.length < track.maxLength) {
+                        track.length += delta * 30.0;
+                    }
+                    
+                    const t = track.length;
+                    let x, y, z;
+
+                    if (track.isNeutral) {
+                        // Straight line
+                        x = t * Math.sin(track.phi) * Math.cos(track.theta);
+                        y = t * Math.sin(track.phi) * Math.sin(track.theta);
+                        z = t * Math.cos(track.phi);
+                    } else {
+                        // Spiral in magnetic field (Helix)
+                        // B-field is along Z-axis. Lorentz force curves X and Y.
+                        const omega = 1.0 / track.radius; // Angular velocity
+                        const vZ = Math.cos(track.phi) * 1.5; // Z velocity
+                        
+                        // Center of the helix
+                        const cx = track.radius * Math.cos(track.theta + Math.PI/2);
+                        const cy = track.radius * Math.sin(track.theta + Math.PI/2);
+                        
+                        x = cx + track.radius * Math.cos(omega * t - Math.PI/2 + track.theta);
+                        y = cy + track.radius * Math.sin(omega * t - Math.PI/2 + track.theta);
+                        z = vZ * t;
+                    }
+                    
+                    // Add to segment list (Origin to current point, or previous point to current)
+                    // For performance, we'll just draw a line from center to current point for now
+                    // A true trailing track requires updating a continuous line. Let's do a trick:
+                    // Draw line from origin to current point (looks like fireworks)
+                    // Actually, let's draw continuous segments by saving previous points.
+                    
+                    if (track.points.length === 0) {
+                        track.points.push(new THREE.Vector3(0,0,0));
+                    }
+                    
+                    const currPos = new THREE.Vector3(x, y, z);
+                    const prevPos = track.points[track.points.length-1];
+                    
+                    // Only add new point if moved enough
+                    if (currPos.distanceTo(prevPos) > 0.5) {
+                        track.points.push(currPos);
+                    }
+                    
+                    const c = new THREE.Color(track.color);
+
+                    // Rebuild buffer geometry data
+                    for(let i=0; i<track.points.length-1; i++) {
+                        if(ptIndex >= maxPoints) break;
+                        
+                        const p1 = track.points[i];
+                        const p2 = track.points[i+1];
+                        
+                        positions[ptIndex*3] = p1.x;
+                        positions[ptIndex*3+1] = p1.y;
+                        positions[ptIndex*3+2] = p1.z;
+                        
+                        positions[ptIndex*3+3] = p2.x;
+                        positions[ptIndex*3+4] = p2.y;
+                        positions[ptIndex*3+5] = p2.z;
+                        
+                        // Fade color over length
+                        const fade = 1.0 - (i / track.maxLength);
+                        
+                        colors[ptIndex*3] = c.r * fade;
+                        colors[ptIndex*3+1] = c.g * fade;
+                        colors[ptIndex*3+2] = c.b * fade;
+                        
+                        colors[ptIndex*3+3] = c.r * fade;
+                        colors[ptIndex*3+4] = c.g * fade;
+                        colors[ptIndex*3+5] = c.b * fade;
+                        
+                        ptIndex += 2;
+                    }
+                });
+                
+                // Update geometry
+                lineGeo.setDrawRange(0, ptIndex);
+                lineGeo.attributes.position.needsUpdate = true;
+                lineGeo.attributes.color.needsUpdate = true;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

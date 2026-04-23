@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Map | Beyond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-overlay {
+            position: absolute;
+            top: 100px;
+            left: 40px;
+            color: #fff;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .universe-info {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            width: 350px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(-20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .universe-info.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .universe-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: var(--accent);
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .physics-data {
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .data-label { color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px;}
+        .data-value { color: #fff; font-weight: 600;}
+
+        #map-controls {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            text-align: right;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+        
+        #main-nav { background: transparent !important; border: none !important; }
+        #main-nav a { color: #fff !important; }
+
+        /* Ensuring Cursor is Highly Visible */
+        #custom-cursor {
+            background: #fff;
+            mix-blend-mode: normal;
+            border: 2px solid rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .math-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-family: monospace;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <nav id="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">Beyond</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="solar.html">Solar System</a></li>
+                <li><a href="concept.html">Concept</a></li>
+                <li><a href="observatory.html">Observatory</a></li>
+                <li><a href="multiverse.html">Multiverse</a></li>
+                <li><a href="observations.html">Observations</a></li>
+                <li><a href="lightspeed.html">Light Speed</a></li>
+                <li><a href="explore.html" class="btn-primary">Join Research</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="ui-overlay">
+        <span class="tag" style="background: var(--accent); color: #fff; border: none;">3D Topography</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; font-weight: 300; letter-spacing: -1px;">Multiverse Mapping</h1>
+        <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Interactive 3D model of detected pocket universes & branes.</p>
+        
+        <div id="u-info" class="universe-info">
+            <h2 id="u-name">Universe Alpha-9</h2>
+            <p id="u-desc" style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 10px;">Our home universe. Expanding at a constant rate.</p>
+            
+            <div class="physics-data">
+                <div><span class="data-label">AGE</span><span id="u-age" class="data-value">13.8B YRS</span></div>
+                <div><span class="data-label">ENTROPY</span><span id="u-entropy" class="data-value">10^104 k_B</span></div>
+                <div><span class="data-label">EXPANSION (H0)</span><span id="u-exp" class="data-value">73.3 km/s/Mpc</span></div>
+                <div><span class="data-label">VACUUM ENERGY</span><span id="u-vac" class="data-value">10^-9 J/m³</span></div>
+                <div><span class="data-label">TOPOLOGY</span><span id="u-top" class="data-value">Flat (k=0)</span></div>
+                <div><span class="data-label">STABILITY</span><span id="u-stab" class="data-value">High</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="math-overlay">
+        <div>Σ Ω_i = Ω_m + Ω_r + Ω_Λ = 1.0002 ± 0.002</div>
+        <div>ds² = -c²dt² + a(t)²(dr²/(1-kr²) + r²dΩ²)</div>
+        <div style="margin-top: 10px; color: var(--accent);">METRIC TENSOR ACTIVE</div>
+    </div>
+
+    <div id="map-controls">
+        DRAG TO ROTATE TENSOR FIELD<br>
+        SCROLL TO ZOOM METRIC<br>
+        CLICK TO INSPECT BRANE
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene Setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.005);
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 30, 120);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for high DPI
+        // renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        // renderer.toneMappingExposure = 1.5;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.3;
+        controls.maxDistance = 500;
+
+        // Hyper-Realistic Deep Space Background (Cosmic Web)
+        const webGeo = new THREE.BufferGeometry();
+        const webMat = new THREE.PointsMaterial({ 
+            color: 0x4a4a8a, 
+            size: 0.3, 
+            transparent: true, 
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        const webPos = [];
+        for (let i = 0; i < 30000; i++) {
+            // Cluster points somewhat towards the center/bands to simulate filaments
+            const u = Math.random();
+            const v = Math.random();
+            const theta = u * 2.0 * Math.PI;
+            const phi = Math.acos(2.0 * v - 1.0);
+            const r = Math.cbrt(Math.random()) * 800; // cubic root for volume distribution
+            
+            // Add some noise to make filament-like structures
+            const x = r * Math.sin(phi) * Math.cos(theta) + (Math.random()-0.5)*100;
+            const y = r * Math.sin(phi) * Math.sin(theta) + (Math.random()-0.5)*100;
+            const z = r * Math.cos(phi) + (Math.random()-0.5)*100;
+            
+            webPos.push(x, y, z);
+        }
+        webGeo.setAttribute('position', new THREE.Float32BufferAttribute(webPos, 3));
+        const cosmicWeb = new THREE.Points(webGeo, webMat);
+        scene.add(cosmicWeb);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x111122, 1);
+        scene.add(ambientLight);
+        
+        // Add a central super-massive glow (The "Bulk")
+        const bulkLight = new THREE.PointLight(0x221155, 5, 500);
+        bulkLight.position.set(0, 0, 0);
+        scene.add(bulkLight);
+
+        // Data for Hyper-Realistic Universes
+        const universes = [];
+        const universeData = [
+            { 
+                name: "Universe Alpha-9 (Home)", color: 0x0088ff, size: 8, pos: [0, 0, 0], 
+                age: "13.8B YRS", entropy: "10^104 k_B", exp: "73.3 km/s/Mpc", vac: "10^-9 J/m³", top: "Flat (k=0)", stab: "High",
+                desc: "Our local spacetime continuum. Dominated by dark energy." 
+            },
+            { 
+                name: "The Crystal Brane", color: 0x00ffcc, size: 12, pos: [40, 20, -30], 
+                age: "94.2B YRS", entropy: "10^12 k_B", exp: "0.0 km/s/Mpc", vac: "10^120 J/m³", top: "Closed (k=1)", stab: "Extreme",
+                desc: "A highly ordered, crystalline spacetime structure with minimal entropy generation." 
+            },
+            { 
+                name: "Void Sector 7", color: 0xff3355, size: 6, pos: [-35, -15, 25], 
+                age: "2.1B YRS", entropy: "10^88 k_B", exp: "850.5 km/s/Mpc", vac: "10^-2 J/m³", top: "Open (k=-1)", stab: "Collapsing",
+                desc: "A nascent, highly chaotic universe undergoing rapid, unstable inflation." 
+            },
+            { 
+                name: "Echo-12 (Mirror)", color: 0x9933ff, size: 9, pos: [-20, 35, 40], 
+                age: "13.8B YRS", entropy: "-10^104 k_B", exp: "-73.3 km/s/Mpc", vac: "-10^-9 J/m³", top: "Anti-de Sitter", stab: "Fluctuating",
+                desc: "A parallel brane with reversed thermodynamic arrow of time. Detected via CMB B-mode polarization." 
+            },
+            { 
+                name: "Nexus Prime", color: 0xffaa00, size: 15, pos: [60, -20, 10], 
+                age: "Unknown", entropy: "Infinity", exp: "Infinite", vac: "Planck Density", top: "11-Dimensional", stab: "Absolute",
+                desc: "A theorized intersection point of multiple branes. Source of inter-universal gravitational waves." 
+            }
+        ];
+
+        // Create Universes with Shaders/Complex Geometry
+        universeData.forEach(data => {
+            const group = new THREE.Group();
+            group.position.set(...data.pos);
+            scene.add(group);
+
+            // Core
+            const coreGeo = new THREE.IcosahedronGeometry(data.size, 8); // High detail sphere
+            const coreMat = new THREE.MeshPhysicalMaterial({
+                color: 0x000000,
+                emissive: data.color,
+                emissiveIntensity: 0.8,
+                roughness: 0.2,
+                metalness: 0.8,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1
+            });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            core.userData = data; // Attach data for raycaster
+            group.add(core);
+
+            // Inner Atmosphere/Glow
+            const atmGeo = new THREE.IcosahedronGeometry(data.size * 1.15, 8);
+            const atmMat = new THREE.MeshBasicMaterial({
+                color: data.color,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.BackSide,
+                blending: THREE.AdditiveBlending
+            });
+            const atm = new THREE.Mesh(atmGeo, atmMat);
+            group.add(atm);
+
+            // Energy Rings / Accretion Disks (for some)
+            if (data.size > 8) {
+                const ringGeo = new THREE.RingGeometry(data.size * 1.4, data.size * 2.2, 128);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: data.color,
+                    transparent: true,
+                    opacity: 0.15,
+                    side: THREE.DoubleSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / (Math.random() * 4 + 1);
+                ring.rotation.y = Math.PI / (Math.random() * 4 + 1);
+                group.add(ring);
+                group.userData.ring = ring; // Store to animate
+            }
+
+            // Localized light source
+            const localLight = new THREE.PointLight(data.color, 2, data.size * 5);
+            group.add(localLight);
+
+            universes.push({ group, core, data });
+        });
+
+        // Cosmic Filaments (Connecting Universes)
+        const lineMat = new THREE.LineBasicMaterial({ 
+            color: 0x5555aa, 
+            transparent: true, 
+            opacity: 0.2,
+            blending: THREE.AdditiveBlending
+        });
+        
+        for (let i = 0; i < universeData.length; i++) {
+            for (let j = i + 1; j < universeData.length; j++) {
+                // Connect with a curved line (simulating gravity well / wormhole)
+                const start = new THREE.Vector3(...universeData[i].pos);
+                const end = new THREE.Vector3(...universeData[j].pos);
+                const mid = start.clone().lerp(end, 0.5);
+                // Offset mid point towards center
+                mid.lerp(new THREE.Vector3(0,0,0), 0.3);
+
+                const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+                const points = curve.getPoints(50);
+                const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(lineGeo, lineMat);
+                scene.add(line);
+            }
+        }
+
+        // Interaction Logic
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        const uInfo = document.getElementById('u-info');
+        const elements = {
+            name: document.getElementById('u-name'),
+            desc: document.getElementById('u-desc'),
+            age: document.getElementById('u-age'),
+            entropy: document.getElementById('u-entropy'),
+            exp: document.getElementById('u-exp'),
+            vac: document.getElementById('u-vac'),
+            top: document.getElementById('u-top'),
+            stab: document.getElementById('u-stab')
+        };
+
+        let hoveredUniverse = null;
+
+        // Custom Cursor Logic
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+
+            // Hover effect
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const cores = universes.map(u => u.core);
+            const intersects = raycaster.intersectObjects(cores);
+
+            if (intersects.length > 0) {
+                document.body.style.cursor = 'pointer';
+                cursor.style.transform = 'scale(1.5)';
+                cursor.style.backgroundColor = 'var(--accent)';
+                cursor.style.borderColor = 'var(--accent)';
+            } else {
+                document.body.style.cursor = 'none'; // Ensure default cursor is hidden
+                cursor.style.transform = 'scale(1)';
+                cursor.style.backgroundColor = '#fff';
+                cursor.style.borderColor = 'rgba(0,0,0,0.8)';
+            }
+        });
+
+        // Hide default cursor globally
+        document.body.style.cursor = 'none';
+
+        window.addEventListener('click', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const cores = universes.map(u => u.core);
+            const intersects = raycaster.intersectObjects(cores);
+
+            if (intersects.length > 0) {
+                const data = intersects[0].object.userData;
+                
+                elements.name.textContent = data.name;
+                elements.desc.textContent = data.desc;
+                elements.age.textContent = data.age;
+                elements.entropy.textContent = data.entropy;
+                elements.exp.textContent = data.exp;
+                elements.vac.textContent = data.vac;
+                elements.top.textContent = data.top;
+                elements.stab.textContent = data.stab;
+                
+                uInfo.classList.add('active');
+                
+                // Emphasize selected
+                universes.forEach(u => {
+                    if(u.core === intersects[0].object) {
+                        u.core.material.emissiveIntensity = 2.0;
+                    } else {
+                        u.core.material.emissiveIntensity = 0.3;
+                    }
+                });
+
+            } else {
+                uInfo.classList.remove('active');
+                // Reset emphasis
+                universes.forEach(u => {
+                    u.core.material.emissiveIntensity = 0.8;
+                });
+            }
+        });
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            controls.update();
+            
+            // Complex animations
+            universes.forEach(u => {
+                // Rotate core
+                u.group.rotation.y += 0.005;
+                u.group.rotation.x += 0.002;
+                
+                // Pulse atmosphere
+                const atm = u.group.children[1];
+                atm.scale.setScalar(1 + Math.sin(time * 2 + u.data.pos[0]) * 0.02);
+
+                // Rotate ring if exists
+                if (u.group.userData.ring) {
+                    u.group.userData.ring.rotation.z += 0.001;
+                }
+                
+                // Subtle floating
+                u.group.position.y = u.data.pos[1] + Math.sin(time + u.data.pos[0]) * 2;
+            });
+
+            // Slowly rotate cosmic web
+            cosmicWeb.rotation.y = time * 0.01;
+            cosmicWeb.rotation.x = time * 0.005;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
