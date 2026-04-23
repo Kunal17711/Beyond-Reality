@@ -1172,8 +1172,316 @@ footer {
     to { opacity: 1; transform: translateX(0); }
 }
 
+/* ===================================================
+   FULL MOBILE RESPONSIVE — Covers Every Page
+   =================================================== */
 
+@media (max-width: 480px) {
+    /* ---- BASE TYPOGRAPHY ---- */
+    html { font-size: 14px; }
+    
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.2rem !important; }
+    p  { font-size: 0.95rem !important; }
 
+    .container { padding: 0 1rem; }
+
+    /* ---- NAVBAR ---- */
+    #main-nav {
+        padding: 1rem 0;
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 1000;
+    }
+
+    #main-nav .container {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .logo { font-size: 1.2rem; margin-bottom: 0; }
+
+    .nav-links {
+        display: flex;
+        gap: 0.8rem;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        width: 100%;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links a, .dropbtn {
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .dropdown-content {
+        position: fixed;
+        left: 10px !important;
+        right: 10px;
+        top: 90px !important;
+        transform: none !important;
+        min-width: unset;
+        width: calc(100vw - 20px);
+        max-height: 50vh;
+        overflow-y: auto;
+        z-index: 2000;
+    }
+
+    .dropdown-content a { padding: 14px 16px; font-size: 0.9rem; }
+
+    /* ---- HERO SECTION ---- */
+    #hero { height: 100svh; padding: 6rem 1rem 3rem; }
+    
+    .hero-content { padding: 0 0.5rem; }
+
+    #hero h1 { font-size: clamp(2.2rem, 10vw, 3.5rem) !important; }
+
+    .subtitle { font-size: 1rem !important; }
+
+    .scroll-indicator { bottom: 1.5rem; }
+
+    /* ---- SECTIONS ---- */
+    .section { padding: 4rem 0; }
+
+    .section-header { margin-bottom: 2rem; }
+
+    .section-header h2 { font-size: 1.8rem !important; }
+
+    /* ---- GRID LAYOUTS ---- */
+    .grid-content {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+    }
+
+    .stat-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card { padding: 1.2rem; }
+    .stat-card .number { font-size: 1.8rem; }
+
+    .notes-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+    }
+
+    .note-card { padding: 1.5rem; border-radius: 20px; }
+
+    .council-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+    }
+
+    /* ---- CTA SECTION ---- */
+    .cta-content {
+        padding: 2rem 1rem;
+        border-radius: 20px;
+    }
+
+    .cta-content h2 { font-size: 1.8rem !important; }
+
+    .cta-form {
+        flex-direction: column;
+        background: transparent;
+        box-shadow: none;
+        gap: 0.8rem;
+    }
+
+    .cta-form input {
+        background: #fff;
+        border-radius: 25px;
+        padding: 0.8rem 1.2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .cta-form button { height: 48px; border-radius: 25px; }
+
+    /* ---- CONTACT FORM ---- */
+    .contact-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+    }
+
+    .contact-form-wrapper { padding: 1.5rem; border-radius: 20px; }
+
+    /* ---- METRICS ---- */
+    .metrics-container { padding: 1.5rem; }
+
+    /* ---- FOOTER ---- */
+    footer { padding: 2rem 0; }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .socials { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+    /* ---- SIMULATOR UI OVERLAYS (all simulator pages) ---- */
+    #ui-overlay {
+        top: 90px !important;
+        left: 10px !important;
+        right: 10px !important;
+        width: auto !important;
+        pointer-events: none;
+    }
+
+    .data-panel {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 1rem !important;
+        font-size: 0.8rem !important;
+        margin-top: 8px !important;
+        pointer-events: auto !important;
+    }
+
+    .data-panel h2 { font-size: 1rem !important; }
+
+    .physics-data { gap: 8px !important; }
+
+    .data-label { font-size: 0.65rem !important; }
+
+    .data-value { font-size: 0.8rem !important; }
+
+    #ui-overlay h1 { font-size: 1.5rem !important; margin-top: 5px; }
+
+    .math-overlay {
+        bottom: 10px !important;
+        left: 10px !important;
+        right: 10px !important;
+        font-size: 0.65rem !important;
+        line-height: 1.4;
+    }
+
+    #controls-info { display: none !important; }
+
+    .title-text { font-size: 1.8rem !important; }
+
+    .page-title { font-size: 1.5rem !important; }
+
+    .btn-group {
+        flex-direction: column !important;
+        gap: 8px;
+    }
+
+    .state-btn { padding: 10px 8px; font-size: 0.7rem; }
+
+    .control-group { margin-top: 15px; }
+
+    /* ---- AI VISION PAGE ---- */
+    .article-header { padding: 6rem 1rem 2rem; }
+    .article-header h1 { font-size: 2.5rem !important; }
+
+    .article-section {
+        flex-direction: column !important;
+        padding: 3rem 1rem;
+        gap: 2rem;
+    }
+
+    .article-img-wrapper { width: 100%; }
+
+    .article-text h2 { font-size: 1.6rem !important; }
+
+    /* ---- PARADOX PAGES ---- */
+    .hero { height: auto; min-height: 60vh; padding: 7rem 1rem 3rem; }
+    .hero h1 { font-size: 2.5rem !important; }
+
+    .article-body { padding: 2rem 1rem; }
+
+    .main-image-container { margin: -2rem auto 2rem; }
+
+    .quote-block {
+        font-size: 1.2rem !important;
+        padding: 0 1rem;
+        margin: 2rem 0;
+    }
+
+    .article-text { font-size: 1rem !important; }
+
+    .section-title { font-size: 1.5rem !important; }
+
+    .conclusion { padding: 1.5rem; }
+
+    .conclusion p { font-size: 1.1rem !important; }
+
+    /* ---- MANIFESTO ---- */
+    .manifesto-title { font-size: 2.2rem !important; }
+    .manifesto-text { font-size: 1rem !important; }
+    .lead { font-size: 1.1rem !important; }
+
+    /* ---- TAG ---- */
+    .tag { font-size: 0.7rem; }
+}
+
+/* Medium mobile / large phones (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    html { font-size: 15px; }
+
+    .container { padding: 0 1.5rem; }
+
+    #main-nav .container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .nav-links {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .dropdown-content {
+        position: fixed;
+        left: 10px !important;
+        right: 10px;
+        top: 85px !important;
+        transform: none !important;
+        width: calc(100vw - 20px);
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+
+    .grid-content { grid-template-columns: 1fr !important; gap: 2rem; }
+
+    .notes-grid { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+    .article-section { flex-direction: column !important; padding: 3rem 1.5rem; }
+
+    .hero h1 { font-size: 2.8rem !important; }
+
+    #ui-overlay {
+        top: 90px !important;
+        left: 15px !important;
+        right: 15px !important;
+        width: auto !important;
+    }
+
+    .data-panel {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 1.2rem !important;
+    }
+
+    .footer-content { flex-direction: column; gap: 1rem; text-align: center; }
+
+    .cta-content { padding: 2.5rem 1.5rem; }
+
+    .contact-grid { grid-template-columns: 1fr !important; }
+}
 
 
 
