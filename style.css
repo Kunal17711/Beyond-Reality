@@ -516,7 +516,7 @@ h1, h2, h3 {
 /* Notes Grid */
 .notes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
 }
 
@@ -695,7 +695,34 @@ footer {
     }
     
     .nav-links {
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+        gap: 1.5rem;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+    }
+    
+    .nav-links::-webkit-scrollbar {
         display: none;
+    }
+    
+    #main-nav .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .logo {
+        margin-bottom: 15px;
+    }
+    
+    .dropdown-content {
+        left: 0;
+        transform: none;
+        min-width: 200px;
+        max-height: 40vh;
     }
 }
 
@@ -788,7 +815,7 @@ footer {
 /* Council Grid */
 .council-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 4rem;
     margin-top: 4rem;
 }
